@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/06 16:47:51 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/06 19:00:51 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static void	close_all_file_descriptor(void)
     int number_of_fd;
 	int fd;
 
-	fd = 2;
+	fd = 0;
 	number_of_fd = getdtablesize();
 	while (++fd < number_of_fd)
 		close(fd);

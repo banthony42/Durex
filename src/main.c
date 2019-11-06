@@ -6,26 +6,20 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:28:52 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/06 16:48:15 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/06 19:02:34 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Durex.h"
-#include "Daemon.h"
 
 int main(void)
 {
+	t_server server;
 	puts("banthony\nlfourque");
-	if (!daemonize("./")) {
-		puts("Daemon start has failed!");
+	if (!daemonize("./"))
 		return (EXIT_FAILURE);
-	}
-	puts("Daemon is running!");
 	install_service();
-	create_server();
-	while(42)
-	{
-		;
-	}
+	create_server(&server, 4242);
+	connection_handler(&server);
 	return (EXIT_SUCCESS);
 }
