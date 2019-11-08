@@ -1,0 +1,19 @@
+********************************************************************************
+
+                                                          :::      ::::::::
+     TODO.txt                                           :+:      :+:    :+:
+                                                      +:+ +:+         +:+
+     By: banthony <banthony@student.42.fr>          +#+  +:+       +#+
+                                                  +#+#+#+#+#+   +#+
+     Created: 2019/11/08 18:43:57 by banthony          #+#    #+#
+     Updated: 2019/11/08 18:50:43 by banthony         ###   ########.fr         
+
+********************************************************************************
+
+*	Implement client connexion (with t_list of client)
+*	Add authentication check after read/recv from client:
+		GRANTED -> treat client input as cmd
+		NOT GRANTED -> Compare client input with password
+*	Use recv / send for client / server com
+*	Try to use syslog on Linux, implement a basic log function to 42 dev
+*	Clean the code

@@ -6,7 +6,7 @@
 #    By: banthony <banthony@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/06 13:17:44 by banthony          #+#    #+#              #
-#    Updated: 2019/11/06 16:46:37 by banthony         ###   ########.fr        #
+#    Updated: 2019/11/08 15:08:34 by banthony         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -67,8 +67,10 @@ TRASH = Makefile~		\
 		./src/*.c~		\
 		./include/*.h~	\
 		./durex.lock	\
+		./*_log.txt		\
 
 all: $(NAME)
+	@echo "\033[32m•\033[0m $(NAME) ready"
 
 $(NAME): $(SRC) $(INCLUDE)
 ifneq ($(WITH_LIBFT), 0)
@@ -87,6 +89,7 @@ endif
 	mkdir -p $(OBJ_PATH)
 	mv $(OBJ) $(OBJ_PATH)
 	gcc $(FLAGS) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME) -o $(NAME) $(LIB)
+	@echo "\033[32m•\033[0m $(NAME) ready
 
 clean:
 ifneq ($(WITH_LIBFT), 0)
