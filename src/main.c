@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:28:52 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/06 19:02:34 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/12 15:06:20 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,6 @@ int main(void)
 		return (EXIT_FAILURE);
 	install_service();
 	create_server(&server, 4242);
-	connection_handler(&server);
+	server_loop(&server);
 	return (EXIT_SUCCESS);
 }

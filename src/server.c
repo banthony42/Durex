@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/08 18:51:47 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/12 19:17:09 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,27 @@
 // use send instead for clients
 static void		puts_data_fd(char *data, size_t len, int fd)
 {
-	if (fd > 0)
+	if (fd > 0 && data)
 		write(fd, data, len);
 }
 
-static void		welcome_client(int client_socket)
+static void		puts_msg_fd(char *msg, int fd)
+{
+	puts_data_fd(msg, strlen(msg), fd);
+}
+
+static void		client_info_fd(t_client clt, char *msg, int fd)
+{
+	char	client_info[255] = {0};
+
+	ft_strncpy(client_info, "Client[", 7);
+	ft_strncat(client_info, clt.addr, strlen(clt.addr));
+	ft_strncat(client_info, "]:", 2);
+	puts_data_fd(client_info, strlen(client_info), fd);
+	puts_data_fd(msg, strlen(msg), fd);
+}
+
+static void		welcome_client(t_client *clt)
 {
 	char *mess;
 
@@ -34,7 +50,8 @@ static void		welcome_client(int client_socket)
 			"/*                                                    ###   ########          */\n"
 			"/* ************************************************************************** */\n"
 		"\nDurex>";
-	send(client_socket, mess, strlen(mess), 0);
+	send(clt->socket, mess, strlen(mess), 0);
+	clt->granted = true;
 }
 
 // Accept the connexion
@@ -92,9 +109,7 @@ static t_bool	new_client(t_server *server)
 	FD_SET(cs, &server->masterfdset);
 	server->clients++;
 	// Use buffer instead to call function once
-	puts_data_fd(NEW_CLIENT, strlen(NEW_CLIENT), server->srv_log);
-	puts_data_fd(new_client.addr, strlen(new_client.addr), server->srv_log);
-	puts_data_fd("\n", 1, server->srv_log);
+	client_info_fd(new_client, "Connected !\n", server->srv_log);
 	return (true);
 }
 
@@ -119,7 +134,65 @@ t_bool	create_server(t_server *server, int port)
 	return (true);
 }
 
-t_bool	connection_handler(t_server *server)
+static void		del_client(void *data, size_t size)
+{
+	if (!data)
+		return ;
+	(void)size;
+}
+static t_bool	client_handler(t_server *server, int fd)
+{
+	t_list		*elmt;
+	t_list		*prev;
+	t_client	*client;
+	char		buf[READ_BUFFER_SIZE];
+	ssize_t		ret;
+
+	prev = NULL;
+	elmt = server->client_lst;
+	dprintf(server->srv_log, "SIZE_CLIENT_LIST:%zu\n", ft_lstlen(server->client_lst));
+	while (elmt)
+	{
+		client = (t_client*)elmt->content;
+		if (fd == client->socket)
+		{
+			// use rcv instead
+			if ((ret = recv(fd, buf, READ_BUFFER_SIZE, 0)) < 0)
+			{
+				FD_CLR(fd, &server->masterfdset);
+				close(fd);
+				client_info_fd(*client, "deconnected.\n", server->srv_log);
+				server->clients--;
+				// If we are not on the first elmt, relink the list
+				if (prev)
+					prev->next = elmt->next;
+				// Update the first elmt if it's the first elmt
+				else
+					server->client_lst = elmt->next;
+				// Finally delete this elmt
+				ft_lstdelone(&elmt, del_client);
+				return (true);
+			}
+			if (client->granted == false)
+			{
+				char *mess = "\xe2\x98\x82  - Enter password:";
+				(!ft_strncmp(buf, PASSWORD, (size_t)ret)) ? welcome_client(client)
+					: puts_data_fd(mess, strlen(mess), fd);
+				elmt->content = client;
+				break ;
+			}
+			buf[ret] = '\0';
+			client_info_fd(*client, buf, server->srv_log);
+			puts_msg_fd("Durex>", fd);
+			break ;
+		}
+		prev = elmt;
+		elmt = elmt->next;
+	}
+	return (true);
+}
+
+t_bool	server_loop(t_server *server)
 {
 	int		i;
 	fd_set	readfdset;
@@ -128,15 +201,14 @@ t_bool	connection_handler(t_server *server)
 	FD_ZERO(&server->masterfdset);
 	FD_SET(server->srv_sock, &server->masterfdset);
 	// Code for tmp syslog
-	char *mess = "";
 	server->srv_log = open("durex_log.txt", O_CREAT | O_RDWR, 0700);
-	puts_data_fd(SERVER_STARTED, strlen(SERVER_STARTED), server->srv_log);
+	puts_msg_fd(SERVER_STARTED, server->srv_log);
 	while (42)
 	{
 		readfdset = server->masterfdset;
 		if (select(FD_SETSIZE, &readfdset, NULL, NULL, NULL) < 0)
 		{
-			// Log error
+			puts_msg_fd("Select error\n", server->srv_log);
 			return (false);
 		}
 		i = -1;
@@ -145,35 +217,12 @@ t_bool	connection_handler(t_server *server)
 			// Does this descriptor is ready for read ?
 			if (FD_ISSET(i, &readfdset) == 0)
 				continue;
-			mess = "FD IS SET\n";
-			puts_data_fd(mess, strlen(mess), server->srv_log);
-			// If it correspond to the server descriptor, handle a new connexion
+				// If it correspond to the server descriptor, handle a new connexion
 			if (FD_ISSET(server->srv_sock, &readfdset))
 				new_client(server);
 			// Otherwise, handle client data
 			else
-			{
-				char	buf[READ_BUFFER_SIZE];
-				ssize_t		ret;
-				// use rcv instead
-				if ((ret = read(i, buf, READ_BUFFER_SIZE)) < 0)
-				{
-					FD_CLR(i, &server->masterfdset);
-					close(i);
-					mess = "PING\n";
-					puts_data_fd(mess, strlen(mess), server->srv_log);
-					server->clients--;
-				}
-				else
-				{
-					buf[ret] = '\0';
-					puts_data_fd(buf, (size_t)ret, server->srv_log);
-					if (!ft_strncmp(buf, PASSWORD, (size_t)ret))
-					{
-						welcome_client(i);
-					}
-				}
-			}
+				client_handler(server, i);
 		}
 	}
 }
