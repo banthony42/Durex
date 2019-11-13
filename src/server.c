@@ -6,33 +6,34 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/12 19:17:09 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/13 17:50:03 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.h"
+#include "durex_log.h"
 
-// use send instead for clients
-static void		puts_data_fd(char *data, size_t len, int fd)
+/*
+**	Build client prefix string: 'Client[x.x.x.x]:'
+*/
+static t_bool	client_prefix(void *data, char (*prefix)[PREFIX_SIZE])
 {
-	if (fd > 0 && data)
-		write(fd, data, len);
+	t_client *client;
+
+	if (!(client = (t_client*)data) || !prefix)
+		return (false);
+	if (7 + 2 +  ft_strlen(client->addr) >= PREFIX_SIZE)
+		return (false);
+	ft_strncpy(&(*prefix)[0], "Client[", 7);
+	ft_strncat(&(*prefix)[0], client->addr, ft_strlen(client->addr));
+	ft_strncat(&(*prefix)[0], "]:", 2);
+	return (true);
 }
 
-static void		puts_msg_fd(char *msg, int fd)
+static void		send_text(char *text, int socket)
 {
-	puts_data_fd(msg, strlen(msg), fd);
-}
-
-static void		client_info_fd(t_client clt, char *msg, int fd)
-{
-	char	client_info[255] = {0};
-
-	ft_strncpy(client_info, "Client[", 7);
-	ft_strncat(client_info, clt.addr, strlen(clt.addr));
-	ft_strncat(client_info, "]:", 2);
-	puts_data_fd(client_info, strlen(client_info), fd);
-	puts_data_fd(msg, strlen(msg), fd);
+	if (socket > 0 && text)
+		send(socket, text, ft_strlen(text), 0);
 }
 
 static void		welcome_client(t_client *clt)
@@ -50,19 +51,40 @@ static void		welcome_client(t_client *clt)
 			"/*                                                    ###   ########          */\n"
 			"/* ************************************************************************** */\n"
 		"\nDurex>";
-	send(clt->socket, mess, strlen(mess), 0);
+	send_text(mess, clt->socket);
 	clt->granted = true;
+	durex_log_with(CLIENT_LOG, LOG_INFO, client_prefix, clt);
 }
 
-// Accept the connexion
-// Check if the maximum of client is reached
-// If it is refused the new clients with message
-// If it's OK Add the client to the client list
-// Ask for password to the client
-// At each client handling we check the client is granted
-// if it's not, compare readed data with password
-// if it's match, welcome the clients,
-// if it's mismatch refused the client connexion
+static t_bool	add_client(t_server *server, int cs, struct sockaddr_in csin)
+{
+	t_list		*nc;
+	t_client	new_client;
+
+	new_client.socket = cs;
+	new_client.addr = inet_ntoa(csin.sin_addr);
+	new_client.granted = false;
+	if (!(nc = ft_lstnew(&new_client, sizeof(new_client))))
+	{
+		durex_log(ALLOC_ERR("Connexion aborted.\n"), LOG_WARNING);
+		send_text(ALLOC_ERR("Connexion aborted.\n"), cs);
+		FD_CLR(cs, &server->masterfdset);
+		close(cs);
+		return (false);
+	}
+
+	if (server->client_lst == NULL)
+		server->client_lst = nc;
+	else
+		ft_lstadd(&server->client_lst, nc);
+
+	send_text(PASS_REQUEST, cs);
+	FD_SET(cs, &server->masterfdset);
+	server->clients++;
+	durex_log_with(CLIENT_LOGIN, LOG_INFO, client_prefix, &new_client);
+	return (true);
+}
+
 static t_bool	new_client(t_server *server)
 {
 	int					cs;
@@ -71,46 +93,18 @@ static t_bool	new_client(t_server *server)
 
 	if ((cs = accept(server->srv_sock, (struct sockaddr*)&csin, &cs_len)) < 0)
 	{
-		// Log error
+		durex_log(ACCEPT_ERR, LOG_ERROR);
 		return (false);
 	}
 	if (server->clients >= MAX_CLIENT)
 	{
-		// Log error max client reached
-		char *mess = "Connexion refused\n";
-		puts_data_fd(mess, strlen(mess), server->srv_log);
-		puts_data_fd(mess, strlen(mess), cs);
+		durex_log(CONNEXION_REFUSED, LOG_INFO);
+		send_text(CONNEXION_REFUSED, cs);
 		FD_CLR(cs, &server->masterfdset);
 		close(cs);
 		return (false);
 	}
-
-	// New client !
-	t_list		*nc;
-	char		*mess;
-	t_client	new_client;
-	new_client.socket = cs;
-	new_client.addr = inet_ntoa(csin.sin_addr);
-	new_client.granted = false;
-	if (!(nc = ft_lstnew(&new_client, sizeof(new_client))))
-	{
-		// Log error - warn client
-		FD_CLR(cs, &server->masterfdset);
-		close(cs);
-		return (false);
-	}
-	if (server->client_lst == NULL)
-		server->client_lst = nc;
-	else
-		ft_lstadd(&server->client_lst, nc);
-
-	mess = "\xe2\x98\x82  - Enter password:";
-	puts_data_fd(mess, strlen(mess), cs);
-	FD_SET(cs, &server->masterfdset);
-	server->clients++;
-	// Use buffer instead to call function once
-	client_info_fd(new_client, "Connected !\n", server->srv_log);
-	return (true);
+	return (add_client(server, cs, csin));
 }
 
 t_bool	create_server(t_server *server, int port)
@@ -150,18 +144,17 @@ static t_bool	client_handler(t_server *server, int fd)
 
 	prev = NULL;
 	elmt = server->client_lst;
-	dprintf(server->srv_log, "SIZE_CLIENT_LIST:%zu\n", ft_lstlen(server->client_lst));
 	while (elmt)
 	{
 		client = (t_client*)elmt->content;
 		if (fd == client->socket)
 		{
 			// use rcv instead
-			if ((ret = recv(fd, buf, READ_BUFFER_SIZE, 0)) < 0)
+			if ((ret = recv(fd, buf, READ_BUFFER_SIZE, 0)) <= 0)
 			{
 				FD_CLR(fd, &server->masterfdset);
 				close(fd);
-				client_info_fd(*client, "deconnected.\n", server->srv_log);
+				durex_log_with(DISCONNECTED, LOG_INFO, client_prefix, client);
 				server->clients--;
 				// If we are not on the first elmt, relink the list
 				if (prev)
@@ -175,15 +168,18 @@ static t_bool	client_handler(t_server *server, int fd)
 			}
 			if (client->granted == false)
 			{
-				char *mess = "\xe2\x98\x82  - Enter password:";
 				(!ft_strncmp(buf, PASSWORD, (size_t)ret)) ? welcome_client(client)
-					: puts_data_fd(mess, strlen(mess), fd);
+					: send_text(PASS_REQUEST, fd);
 				elmt->content = client;
 				break ;
 			}
 			buf[ret] = '\0';
-			client_info_fd(*client, buf, server->srv_log);
-			puts_msg_fd("Durex>", fd);
+			if (!ft_strncmp(buf, "help\n", ret))
+				send_text(HELP, fd);
+			else if (!ft_strncmp(buf, "shell\n", ret))
+				send_text("not implemented yet.", fd);
+			durex_log_with(buf, LOG_INFO, client_prefix, client);
+			send_text(SERVER_PROMPT, fd);
 			break ;
 		}
 		prev = elmt;
@@ -200,15 +196,13 @@ t_bool	server_loop(t_server *server)
 	FD_ZERO(&readfdset);
 	FD_ZERO(&server->masterfdset);
 	FD_SET(server->srv_sock, &server->masterfdset);
-	// Code for tmp syslog
-	server->srv_log = open("durex_log.txt", O_CREAT | O_RDWR, 0700);
-	puts_msg_fd(SERVER_STARTED, server->srv_log);
+	durex_log(SERVER_STARTED, LOG_INFO);
 	while (42)
 	{
 		readfdset = server->masterfdset;
 		if (select(FD_SETSIZE, &readfdset, NULL, NULL, NULL) < 0)
 		{
-			puts_msg_fd("Select error\n", server->srv_log);
+			durex_log(SELECT_ERR, LOG_ERROR);
 			return (false);
 		}
 		i = -1;

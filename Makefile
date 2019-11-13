@@ -6,7 +6,7 @@
 #    By: banthony <banthony@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/06 13:17:44 by banthony          #+#    #+#              #
-#    Updated: 2019/11/08 15:08:34 by banthony         ###   ########.fr        #
+#    Updated: 2019/11/13 15:13:16 by abara            ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -20,6 +20,7 @@ PATH_HEAD = ./include/
 
 SRC_FILE +=	main.c
 SRC_FILE +=	daemon.c
+SRC_FILE +=	durex_log.c
 SRC_FILE +=	server.c
 SRC_FILE +=	install_service.c
 
@@ -28,35 +29,33 @@ SRC = $(SRC_FILE:%c=$(PATH_SRC)%c)
 OBJ = $(SRC_FILE:.c=.o)
 OBJ2 = $(OBJ:%.o=$(OBJ_PATH)%.o)
 
-UNAME := $(shell uname)
-
-WITH_LIBFT = 0
-ifneq ($(WITH_LIBFT), 0)
+# Libft path and flags
 LIBFT = ./libft
 HEAD_LIBFT = -I $(LIBFT)
 LIBFT_NAME = -L $(LIBFT) -lft
 LIBFT_NAME_SANIT = -L $(LIBFT) -lft_sanit
-else
-LIBFT =
-HEAD_LIBFT =
-LIBFT_NAME =
-LIBFT_NAME_SANIT =
-endif
+
+# preprocessor macro at compile time
+DEFINE = 
+
+# 1 : Durex will use syslog, to log info into file.
+# 0 : Durex will use homemade tool to log info into file.
+USE_SYSLOG = 0
+
+UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
-LIB =
-HEAD_DIR = -I $(PATH_HEAD) $(HEAD_LIBFT)
-FLAGS = -Wall -Wextra -Werror
+OTHER_LIB =
+ifeq ($(USE_SYSLOG), 1)
+DEFINE += -D USE_SYSLOG
 endif
-
-ifeq ($(UNAME), CYGWIN_NT-6.1)
-LIB =
 HEAD_DIR = -I $(PATH_HEAD) $(HEAD_LIBFT)
 FLAGS = -Wall -Wextra -Werror
 endif
 
 ifeq ($(UNAME), Darwin)
-LIB =
+OTHER_LIB =
+DEFINE += -D USE_SYSLOG
 HEAD_DIR = -I $(PATH_HEAD) $(HEAD_LIBFT)
 FLAGS = -Wall -Wextra -Werror -Weverything
 endif
@@ -66,29 +65,23 @@ DEBUG = -g3 -fsanitize=address
 TRASH = Makefile~		\
 		./src/*.c~		\
 		./include/*.h~	\
-		./durex.lock	\
-		./*_log.txt		\
 
 all: $(NAME)
 	@echo "\033[32m•\033[0m $(NAME) ready"
 
 $(NAME): $(SRC) $(INCLUDE)
-ifneq ($(WITH_LIBFT), 0)
 	make -C $(LIBFT) sanit
-endif
-	gcc $(FLAGS) $(HEAD_DIR) -c $(SRC) $(DEBUG)
+	gcc $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) $(DEBUG) $(DEFINE)
 	mkdir -p $(OBJ_PATH)
 	mv $(OBJ) $(OBJ_PATH)
-	gcc $(FLAGS) -o $(NAME) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME_SANIT) $(LIB) $(DEBUG)
+	gcc $(FLAGS) -o $(NAME) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME_SANIT) $(OTHER_LIB) $(DEBUG) $(DEFINE)
 
 normal: $(SRC) $(INCLUDE)
-ifneq ($(WITH_LIBFT), 0)
 	make -C $(LIBFT)
-endif
-	gcc $(FLAGS) $(HEAD_DIR) $(LIB) -c $(SRC)
+	gcc $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) $(DEFINE)
 	mkdir -p $(OBJ_PATH)
 	mv $(OBJ) $(OBJ_PATH)
-	gcc $(FLAGS) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME) -o $(NAME) $(LIB)
+	gcc $(FLAGS) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME) -o $(NAME) $(OTHER_LIB) $(DEFINE)
 	@echo "\033[32m•\033[0m $(NAME) ready
 
 clean:
