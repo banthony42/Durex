@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/13 15:13:39 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/14 19:28:54 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,6 @@ t_bool		daemonize(const char *path)
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, signal_handler);
 	signal(SIGKILL, signal_handler);
-	signal(SIGCHLD, signal_handler);
+	//	signal(SIGCHLD, signal_handler);
 	return (true);
 }

@@ -6,7 +6,7 @@
 #    By: banthony <banthony@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/06 13:17:44 by banthony          #+#    #+#              #
-#    Updated: 2019/11/13 15:13:16 by abara            ###   ########.fr        #
+#    Updated: 2019/11/14 12:25:52 by banthony         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -22,6 +22,7 @@ SRC_FILE +=	main.c
 SRC_FILE +=	daemon.c
 SRC_FILE +=	durex_log.c
 SRC_FILE +=	server.c
+SRC_FILE +=	server_command.c
 SRC_FILE +=	install_service.c
 
 SRC = $(SRC_FILE:%c=$(PATH_SRC)%c)
@@ -36,7 +37,7 @@ LIBFT_NAME = -L $(LIBFT) -lft
 LIBFT_NAME_SANIT = -L $(LIBFT) -lft_sanit
 
 # preprocessor macro at compile time
-DEFINE = 
+DEFINE =
 
 # 1 : Durex will use syslog, to log info into file.
 # 0 : Durex will use homemade tool to log info into file.
@@ -67,6 +68,7 @@ TRASH = Makefile~		\
 		./include/*.h~	\
 
 all: $(NAME)
+	@echo "\033[32m•\033[0m $(UNAME) config"
 	@echo "\033[32m•\033[0m $(NAME) ready"
 
 $(NAME): $(SRC) $(INCLUDE)
@@ -85,15 +87,11 @@ normal: $(SRC) $(INCLUDE)
 	@echo "\033[32m•\033[0m $(NAME) ready
 
 clean:
-ifneq ($(WITH_LIBFT), 0)
 	make clean -C $(LIBFT)
-endif
 	rm -rf $(OBJ_PATH) $(TRASH)
 
 fclean: clean
-ifneq ($(WITH_LIBFT), 0)
 	make fclean -C $(LIBFT)
-endif
 	rm -f $(NAME)
 	-rm $(OBJ)
 

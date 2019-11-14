@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:18 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/13 15:37:47 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/14 16:13:52 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include "utils.h"
 #include "Daemon.h"
 #include "server.h"
+
+# define MAX_CLIENT 3
 
 void	install_service(void);
 

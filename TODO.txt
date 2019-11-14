@@ -10,10 +10,14 @@
 
 ********************************************************************************
 
-*	Implement client connexion (with t_list of client)
-*	Add authentication check after read/recv from client:
-		GRANTED -> treat client input as cmd
-		NOT GRANTED -> Compare client input with password
-*	Use recv / send for client / server com
 *	Try to use syslog on Linux, implement a basic log function to 42 dev
 *	Clean the code
+*	Rework / clean shell spawning
+Note :
+
+If the signal handler watch SIGCHLD, a son can interrupt select syscall
+ * This cause select to fail
+
+Solutions:
+ * Implement automatic syscall restarting using SA_RESTART in signal handling.
+ * Dont wait child and ignore SIGCHLD because child is independant (shell instance)
