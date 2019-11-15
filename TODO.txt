@@ -10,14 +10,9 @@
 
 ********************************************************************************
 
+*	Implement install durex as service
+*	Hide password
 *	Try to use syslog on Linux, implement a basic log function to 42 dev
-*	Clean the code
-*	Rework / clean shell spawning
-Note :
+*	Clean the code / try to separate durex part from server part
 
-If the signal handler watch SIGCHLD, a son can interrupt select syscall
- * This cause select to fail
 
-Solutions:
- * Implement automatic syscall restarting using SA_RESTART in signal handling.
- * Dont wait child and ignore SIGCHLD because child is independant (shell instance)

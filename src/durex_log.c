@@ -6,7 +6,7 @@
 /*   By: abara <banthony@student.42.fr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/13 16:01:21 by abara             #+#    #+#             */
-/*   Updated: 2019/11/14 12:29:23 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/15 14:10:52 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	durex_log(char *mess, t_log_type type)
 				+ ft_strlen(separator)
 				+ ft_strlen(g_log_info[type])
 				+ ft_strlen(separator)
-				+ ft_strlen(mess);
+				+ ft_strlen(mess) + 1;
 	if (!(log = ft_strnew(log_size + 1)))
 		return ;
 	ft_strncpy(log, time_string, ft_strlen(time_string));
@@ -88,6 +88,7 @@ void	durex_log(char *mess, t_log_type type)
 	ft_strncat(log, g_log_info[type], ft_strlen(g_log_info[type]));
 	ft_strncat(log, separator, ft_strlen(separator));
 	ft_strncat(log, mess, ft_strlen(mess));
+	ft_strncat(log, "\n", 1);
 	write(g_log_fd, log, log_size);
 }
 

@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/14 19:28:54 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/15 13:30:34 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void	signal_handler(int signal)
 		case SIGCHLD:
 			//Log info
 			// Wait for any child process
-			wait(NULL);
+			//			wait(NULL);
 			break;
 		default:
 		 	break;
