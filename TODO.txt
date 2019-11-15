@@ -16,3 +16,14 @@
 *	Clean the code / try to separate durex part from server part
 
 
+
+REF:
+https://support.rackspace.com/how-to/checking-running-services-on-linux/
+
+https://superuser.com/questions/1403601/systemd-service-permission-denied
+
+https://access.redhat.com/documentation/fr-fr/red_hat_enterprise_linux/7/html/system_administrators_guide/sect-managing_services_with_systemd-unit_files
+
+https://www.shellhacks.com/systemd-service-file-example/
+
+https://medium.com/@benmorel/creating-a-linux-service-with-systemd-611b5c8b91d6
