@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/15 16:04:18 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/18 12:51:45 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@
 // Temporary const password (totally unsecure)
 # define SERVER_PROMPT "Durex>"
 # define PASS_REQUEST "\xe2\x98\x82  - Enter password:"
-# define PASSWORD "4242\n"
+# define PASSWORD "\x34\x32\x34\x32\x0a"
 
 typedef struct s_server
 {

@@ -11,11 +11,17 @@
 ********************************************************************************
 
 *	Implement install durex as service
+*	remove lock file when stoping service
 *	Hide password
 *	Try to use syslog on Linux, implement a basic log function to 42 dev
 *	Clean the code / try to separate durex part from server part
 
-
+BONUS:
+*	Implement uninstall durex.service
+*	Implement keylogger ?
+*	Implement screenshot ?
+*	Implement listen mic ?
+*	Implement cam view ?
 
 REF:
 https://support.rackspace.com/how-to/checking-running-services-on-linux/

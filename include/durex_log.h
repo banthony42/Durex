@@ -6,7 +6,7 @@
 /*   By: abara <banthony@student.42.fr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/13 16:05:30 by abara             #+#    #+#             */
-/*   Updated: 2019/11/14 13:08:33 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/18 12:08:39 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <fcntl.h>
 #include <time.h>
+#include <errno.h>
 #include "utils.h"
 #include "libft.h"
 

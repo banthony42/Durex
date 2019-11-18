@@ -6,11 +6,12 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/15 13:30:34 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/18 14:47:21 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Daemon.h"
+#include "durex_log.h"
 
 static void	fork_and_kill_dad(void)
 {
@@ -64,7 +65,7 @@ static void	lock_daemon(void)
 		//Log error
 		exit(EXIT_FAILURE);
 	}
-
+	dprintf(fd, "%d", getpid());
 	if (flock(fd, LOCK_EX | LOCK_NB) < 0)
 	{
 		// Log error
@@ -77,22 +78,17 @@ void	signal_handler(int signal)
     switch (signal)
 	{
 		case SIGTERM:
-			// Log info
+			durex_log("SIGTERM", LOG_WARNING);
 			kill_daemon();
 		case SIGINT:
-			// Log info
+			durex_log("SIGINT", LOG_WARNING);
 			kill_daemon();
 		case SIGQUIT:
-			// Log info
+			durex_log("SIGQUIT", LOG_WARNING);
 			kill_daemon();
 		case SIGKILL:
-			// Log info
+			durex_log("SIGKILL", LOG_WARNING);
 			kill_daemon();
-		case SIGCHLD:
-			//Log info
-			// Wait for any child process
-			//			wait(NULL);
-			break;
 		default:
 		 	break;
 	}
@@ -102,23 +98,28 @@ void		kill_daemon(void)
 {
     if (remove(DUREX_LOCK))
 	{
-		// Log error
+		durex_log("Fail to delete file lock.", LOG_WARNING);
 		exit(EXIT_FAILURE);
 	}
-	// Log info
+	durex_log("Daemon successfully killed.", LOG_INFO);
 	exit(EXIT_SUCCESS);
 }
 
 t_bool		daemonize(const char *path)
 {
-	int signal_n;
+	int		signal_n;
 
 	if (!access(DUREX_LOCK, F_OK) || !path)
+	{
+		durex_log("Durex is already running or is still lock.", LOG_WARNING);
 		return (false);
+	}
 	fork_and_kill_dad();
 	if (setsid() < 0)
 	{
 		// Log error
+		durex_log("Failed to create new session for daemom:", LOG_WARNING);
+		durex_log(strerror(errno), LOG_ERROR);
 		exit(EXIT_FAILURE);
 	}
 	close_all_file_descriptor();
@@ -127,6 +128,8 @@ t_bool		daemonize(const char *path)
 	if (chdir(path) < 0)
 	{
 		// Log error
+		durex_log("Failed to change dir:", LOG_WARNING);
+		durex_log(strerror(errno), LOG_ERROR);
 		exit(EXIT_FAILURE);
 	}
 	lock_daemon();

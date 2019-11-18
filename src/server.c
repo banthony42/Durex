@@ -6,13 +6,12 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/15 15:55:10 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/18 12:08:06 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.h"
 #include "durex_log.h"
-#include<errno.h>
 
 /*
 **	Build client prefix string: 'Client[x.x.x.x]:'

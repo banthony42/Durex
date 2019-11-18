@@ -6,7 +6,7 @@
 /*   By: abara <banthony@student.42.fr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/13 16:01:21 by abara             #+#    #+#             */
-/*   Updated: 2019/11/15 14:10:52 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/18 11:35:38 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,9 @@ void	durex_log(char *mess, t_log_type type)
 	ft_strncat(log, mess, ft_strlen(mess));
 	ft_strncat(log, "\n", 1);
 	write(g_log_fd, log, log_size);
+	if (ft_strncmp(time_string, "[DD/MM/YYYY-HH:MM:SS]", ft_strlen(time_string)))
+		ft_strdel(&time_string);
+	ft_strdel(&log);
 }
 
 void	durex_log_with(char *mess, t_log_type type, t_prefix prefix, void *data)
