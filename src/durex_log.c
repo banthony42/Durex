@@ -6,7 +6,7 @@
 /*   By: abara <banthony@student.42.fr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/13 16:01:21 by abara             #+#    #+#             */
-/*   Updated: 2019/11/19 12:26:21 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/19 17:35:10 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	durex_log_with(char *mess, t_log_type type, t_prefix prefix, void *data)
 
 static void get_log_fd(void)
 {
-	g_log_fd = open(DUREX_LOG_FILE, O_CREAT | O_APPEND | O_RDWR, 0700);
+	g_log_fd = open(DUREX_LOG_FILE, O_CREAT | O_APPEND | O_RDWR, S_IRWXU);
 }
 
 static char	*get_time_string(char *time_format, size_t size)

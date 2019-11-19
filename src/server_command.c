@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/19 13:59:31 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/19 17:36:50 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,13 @@ static t_bool	server_cmd_exit(t_client *client, t_server *server)
 	return (true);
 }
 
+/*
+**	remove /bin/Durex
+**	systemctl stop durex
+**	systemctl disable durex
+**	remove /etc/systemd/system/durex.service
+**	systemctl reset-failed
+*/
 static t_bool	server_cmd_uninstall(t_client *client, t_server *server)
 {
 	if (!server || !client)
