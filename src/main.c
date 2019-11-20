@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:28:52 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/19 18:21:27 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/20 15:01:16 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,10 @@ int main(int ac, char **av)
 		return (EXIT_FAILURE);
 	}
 	durex_log("======== Durex  has started! ========", LOG_WARNING);
-	install_service();
+	install_service(av[0]);
 	ft_memset(&server, 0, sizeof(server));
 	server.require_pass = true;
-	create_server(&server, 4242, MAX_CLIENT);
-	server_loop(&server);
+	if (create_server(&server, 4242, MAX_CLIENT))
+		server_loop(&server);
 	return (EXIT_SUCCESS);
 }

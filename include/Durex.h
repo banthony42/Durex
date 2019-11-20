@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:18 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/19 18:08:32 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/20 16:40:21 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,9 @@
 								"WantedBy=multi-user.target\n"
 # define MAX_CLIENT 3
 
-void	install_service(void);
+#define EXEC_COMMAND(CMD) exec_command(CMD, NAMEOF(CMD)" ...")
+
+void	install_service(char *bin_path);
+t_bool	uninstall_service(void);
 
 #endif

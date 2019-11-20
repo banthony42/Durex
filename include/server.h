@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/18 12:51:45 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/20 16:41:43 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,11 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
 #include "utils.h"
 #include "libft.h"
 #include "durex_log.h"
+#include "message_digest.h"
 
 # define MAX_PENDING_CLIENT 3
 # define READ_BUFFER_SIZE 4096
@@ -41,7 +43,7 @@
 // Temporary const password (totally unsecure)
 # define SERVER_PROMPT "Durex>"
 # define PASS_REQUEST "\xe2\x98\x82  - Enter password:"
-# define PASSWORD "\x34\x32\x34\x32\x0a"
+# define PASSWORD "d7767b86426ebd60a7e8c142160dad6d"
 
 typedef struct s_server
 {

@@ -6,7 +6,7 @@
 #    By: banthony <banthony@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/06 13:17:44 by banthony          #+#    #+#              #
-#    Updated: 2019/11/14 12:25:52 by banthony         ###   ########.fr        #
+#    Updated: 2019/11/20 16:23:08 by abara            ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -24,6 +24,9 @@ SRC_FILE +=	durex_log.c
 SRC_FILE +=	server.c
 SRC_FILE +=	server_command.c
 SRC_FILE +=	install_service.c
+
+SRC_FILE +=	md5_digest.c
+SRC_FILE +=	md5_function.c
 
 SRC = $(SRC_FILE:%c=$(PATH_SRC)%c)
 

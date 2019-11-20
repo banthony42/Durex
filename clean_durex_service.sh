@@ -12,6 +12,12 @@
 
 #!/bin/sh
 
+systemctl stop durex;
+systemctl disable durex;
+systemctl daemon-reload;
+systemctl reset-failed;
+
 rm /etc/systemd/system/durex.service;
 rm /etc/systemd/system/multi-user.target.wants/durex.service;
 rm /var/lock/durex.lock;
+rm /bin/Durex;

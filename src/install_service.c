@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:45:56 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/19 18:33:05 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/20 16:14:14 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,74 @@ static t_bool durex_is_installed(void)
 	return (install_check == 3);
 }
 
-void install_service(void)
+static t_bool copy_file(char *src, char *dst)
+{
+	int		ret;
+	int		in;
+	int		out;
+	char	buf[READ_BUFFER_SIZE];
+	ssize_t	writen;
+	struct stat file_info;
+
+	if (!src || !dst)
+		return (false);
+	if ((in = open(src, O_RDONLY)) < 0)
+	{
+		durex_log("File copy: Cant'open input", LOG_WARNING);
+		durex_log(strerror(errno), LOG_WARNING);
+		return (false);
+	}
+	if ((out = open(dst, O_CREAT | O_EXCL | O_WRONLY, S_IRWXU)) < 0)
+	{
+		durex_log("File copy: Cant'open output", LOG_WARNING);
+		durex_log(strerror(errno), LOG_WARNING);
+		close (in);
+		return (false);
+	}
+	writen = 0;
+	while((ret = read(in, buf, READ_BUFFER_SIZE)) > 0)
+		writen += write(out, buf, ret);
+	fstat(in, &file_info);
+	close(in);
+	close(out);
+	if (writen != file_info.st_size)
+	{
+		durex_log("File copy: Incomplete", LOG_WARNING);
+		return (false);
+	}
+	return (true);
+}
+
+t_bool uninstall_service(void)
+{
+	char	*stop_durex[] = {"/bin/systemctl", "stop", "durex", NULL};
+	char	*disable_durex[] = {"/bin/systemctl", "disable", "durex", NULL};
+	char	*systemctl_reload[] = { "/bin/systemctl", "daemon-reload", NULL};
+	char	*systemctl_reset[] = {"/bin/systemctl", "reset-failed", NULL};
+
+    if (remove(SERVICE_FILE))
+	{
+		durex_log("Fail to delete:" SERVICE_FILE, LOG_WARNING);
+		durex_log(strerror(errno), LOG_WARNING);
+	}
+    if (remove(SERVICE_INSTALL_FILE))
+	{
+		durex_log("Fail to delete:" SERVICE_INSTALL_FILE, LOG_WARNING);
+		durex_log(strerror(errno), LOG_WARNING);
+	}
+    if (remove(SERVICE_BIN))
+	{
+		durex_log("Fail to delete:" SERVICE_BIN, LOG_WARNING);
+		durex_log(strerror(errno), LOG_WARNING);
+	}
+	EXEC_COMMAND(stop_durex);
+	EXEC_COMMAND(disable_durex);
+	EXEC_COMMAND(systemctl_reload);
+	EXEC_COMMAND(systemctl_reset);
+	return (!durex_is_installed());
+}
+
+void install_service(char *bin_path)
 {
 	const char	*durex_service = SERVICE_FILE_CONTENT;
 	char		*systemctl_reload[] = { "/bin/systemctl", "daemon-reload", NULL};
@@ -86,10 +153,13 @@ void install_service(void)
 	durex_log("======== Durex  Installation ========", LOG_WARNING);
 	if (durex_is_installed())
 		return ;
-	// TODO call uninstall function to clear an eventual partial install
-	if ((fd = open(SERVICE_PATH, O_CREAT | O_EXCL | O_WRONLY, S_IRWXU)) < 0)
+	// Install is corrupt or is missing
+	uninstall_service();
+	copy_file(bin_path, SERVICE_BIN);
+	if ((fd = open(SERVICE_FILE, O_CREAT | O_EXCL | O_WRONLY, S_IRWXU)) < 0)
 	{
 		durex_log("Failed: Can't create durex.service.", LOG_WARNING);
+		durex_log(strerror(errno), LOG_WARNING);
 		return ;
 	}
 	ret = write(fd, durex_service, ft_strlen(durex_service));
@@ -101,6 +171,6 @@ void install_service(void)
 	durex_log("durex.service has been correctly generated.", LOG_INFO);
 	close(fd);
 	// Copy Durex binary into /bin/Durex
-	exec_command(systemctl_reload, "systemctl reload daemon ...");
-	exec_command(enable_durex, "systemctl enable durex ...");
+	EXEC_COMMAND(systemctl_reload);
+	EXEC_COMMAND(enable_durex);
 }

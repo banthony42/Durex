@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/08 14:22:09 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/19 15:17:25 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/20 17:12:38 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@
 /*
 **	## - Concatenation operator
 **	(e.g.) Useful to implement dispatcher functions :
-**	COMMAND(help) → { "help", help_command }
+**	COMMAND(help) → { "help", server_cmd_help }
 */
-#define COMMAND(NAME)  { #NAME, NAME ## _command }
+#define COMMAND(NAME) {#NAME, server_cmd_ ## NAME}
 
 typedef enum	e_bool
 {

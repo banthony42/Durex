@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/19 14:34:21 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/20 16:54:24 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,6 +196,7 @@ static t_bool	client_handler(t_server *server, int fd)
 	t_list		*elmt;
 	t_client	*client;
 	char		buf[READ_BUFFER_SIZE];
+	char		*hash_pass;
 	ssize_t		ret;
 
 	elmt = server->client_lst;
@@ -209,9 +210,11 @@ static t_bool	client_handler(t_server *server, int fd)
 				return (deco_client(client, server));
 			if (client->granted == false)
 			{
-				(!ft_strncmp(buf, PASSWORD, (size_t)ret)) ? welcome_client(client)
+				hash_pass = md5_digest((unsigned char*)buf, ret, 0);
+				(!ft_strncmp(hash_pass, PASSWORD, (size_t)ret)) ? welcome_client(client)
 					: send_text(PASS_REQUEST, fd);
 				elmt->content = client;
+				ft_strdel(&hash_pass);
 				break ;
 			}
 			buf[ret] = '\0';

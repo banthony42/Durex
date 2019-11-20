@@ -10,19 +10,19 @@
 
 ********************************************************************************
 
-*	Hide password - (Add ssl md5 src ?)
 *	Clean the code / try to separate durex part from server part
 
-*	Copy durex binary into /bin/
-*	Implement uninstall function, call it on corrupt install
-*	Test with corrupt install
-
 BONUS:
-*	Implement uninstall durex.service
 *	Implement keylogger ?
 *	Implement screenshot ?
 *	Implement listen mic ?
 *	Implement cam view ?
+*	Implement log (send log to the client)
+
+
+BUGS:
+*	Ctrl + D ne fait pas quitter pas le client (close(socket))
+*	Parfois impossible de se connecter au shell qui a spawn
 
 REF:
 https://support.rackspace.com/how-to/checking-running-services-on-linux/
