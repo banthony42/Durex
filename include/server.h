@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/20 16:41:43 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/21 11:03:16 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ typedef enum	e_server_cmd
 	UNINSTALL,
 	SHELL,
 	EXIT,
+	LOG,
 	SERVER_CMD_NUMBER,
 }				t_server_cmd;
 
