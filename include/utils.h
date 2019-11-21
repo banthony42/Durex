@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/08 14:22:09 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/20 17:12:38 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/21 12:36:56 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,6 @@
 */
 #define NAMEOF(str) #str
 #define NAMEOF_CONTENT(s) NAMEOF(s)
-
-/*
-**	## - Concatenation operator
-**	(e.g.) Useful to implement dispatcher functions :
-**	COMMAND(help) → { "help", server_cmd_help }
-*/
-#define COMMAND(NAME) {#NAME, server_cmd_ ## NAME}
 
 typedef enum	e_bool
 {

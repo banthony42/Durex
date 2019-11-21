@@ -6,20 +6,16 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:18 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/20 16:40:21 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/21 14:53:39 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef		DUREX_H
 # define	DUREX_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <errno.h>
 #include "utils.h"
-#include "Daemon.h"
-#include "server.h"
+
+# define READ_BUFFER_SIZE 4096
 
 # define SERVICE_FILE_NAME "durex.service"
 # define SERVICE_PATH "/etc/systemd/system/"
@@ -50,6 +46,7 @@
 #define EXEC_COMMAND(CMD) exec_command(CMD, NAMEOF(CMD)" ...")
 
 void	install_service(char *bin_path);
+t_bool	durex_is_installed(void);
 t_bool	uninstall_service(void);
 
 #endif

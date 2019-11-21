@@ -6,7 +6,7 @@
 #    By: banthony <banthony@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/06 13:17:44 by banthony          #+#    #+#              #
-#    Updated: 2019/11/20 16:23:08 by abara            ###   ########.fr        #
+#    Updated: 2019/11/21 12:22:15 by banthony         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -33,6 +33,8 @@ SRC = $(SRC_FILE:%c=$(PATH_SRC)%c)
 OBJ = $(SRC_FILE:.c=.o)
 OBJ2 = $(OBJ:%.o=$(OBJ_PATH)%.o)
 
+INCLUDE = $($(PAHT_HEAD)%h)
+
 # Libft path and flags
 LIBFT = ./libft
 HEAD_LIBFT = -I $(LIBFT)
@@ -46,23 +48,14 @@ DEFINE =
 # 0 : Durex will use homemade tool to log info into file.
 USE_SYSLOG = 0
 
-UNAME := $(shell uname)
-
-ifeq ($(UNAME), Linux)
-OTHER_LIB =
 ifeq ($(USE_SYSLOG), 1)
 DEFINE += -D USE_SYSLOG
 endif
+
+OTHER_LIB =
+
 HEAD_DIR = -I $(PATH_HEAD) $(HEAD_LIBFT)
 FLAGS = -Wall -Wextra -Werror
-endif
-
-ifeq ($(UNAME), Darwin)
-OTHER_LIB =
-DEFINE += -D USE_SYSLOG
-HEAD_DIR = -I $(PATH_HEAD) $(HEAD_LIBFT)
-FLAGS = -Wall -Wextra -Werror -Weverything
-endif
 
 DEBUG = -g3 -fsanitize=address
 
@@ -71,8 +64,8 @@ TRASH = Makefile~		\
 		./include/*.h~	\
 
 all: $(NAME)
-	@echo "\033[32m•\033[0m $(UNAME) config"
 	@echo "\033[32m•\033[0m $(NAME) ready"
+	@echo $(INCLUDE)
 
 $(NAME): $(SRC) $(INCLUDE)
 	make -C $(LIBFT) sanit

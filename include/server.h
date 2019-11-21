@@ -6,29 +6,19 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/21 11:03:16 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/21 14:16:14 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef		SERVER_H
 # define	SERVER_H
 
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
 #include "utils.h"
 #include "libft.h"
 #include "durex_log.h"
-#include "message_digest.h"
+
 
 # define MAX_PENDING_CLIENT 3
-# define READ_BUFFER_SIZE 4096
 
 # define SERVER_STARTED "======== Server has started! ========"
 # define SELECT_ERR "Server: select has failed."
@@ -44,6 +34,13 @@
 # define SERVER_PROMPT "Durex>"
 # define PASS_REQUEST "\xe2\x98\x82  - Enter password:"
 # define PASSWORD "d7767b86426ebd60a7e8c142160dad6d"
+
+/*
+**	## - Concatenation operator
+**	(e.g.) Useful to implement dispatcher functions :
+**	COMMAND(help) → { "help", server_cmd_help }
+*/
+#define COMMAND(NAME) {#NAME, server_cmd_ ## NAME}
 
 typedef struct s_server
 {
@@ -71,6 +68,7 @@ typedef enum	e_server_cmd
 	SHELL,
 	EXIT,
 	LOG,
+	STATUS,
 	SERVER_CMD_NUMBER,
 }				t_server_cmd;
 

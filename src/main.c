@@ -6,11 +6,16 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:28:52 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/20 15:01:16 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/21 12:14:13 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "Durex.h"
+#include "server.h"
+#include "Daemon.h"
+#include "libft.h"
 
 static t_bool	is_root(char *bin)
 {

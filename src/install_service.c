@@ -6,11 +6,19 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:45:56 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/20 16:14:14 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/21 12:59:53 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/wait.h>
 #include "Durex.h"
+#include "libft.h"
+#include "durex_log.h"
 
 extern char **environ;
 
@@ -44,7 +52,7 @@ static t_bool	exec_command(char **command, char *info)
 **	/etc/systemd/system/multi-user.target.wants/durex.service
 **	/bin/Durex
 */
-static t_bool durex_is_installed(void)
+t_bool durex_is_installed(void)
 {
 	const char	*files[] = {SERVICE_FILE, SERVICE_INSTALL_FILE, SERVICE_BIN, NULL};
 	const char	*found_suffix = " => OK !";
@@ -55,7 +63,7 @@ static t_bool durex_is_installed(void)
 
 	i = -1;
 	install_check = 0;
-	durex_log("Checking  Installation :", LOG_WARNING);
+	durex_log("Checking  Installation :", LOG_INFO);
 	while (files[++i])
 	{
 		ft_strncpy(tmp, "* ", PATH_MAX);

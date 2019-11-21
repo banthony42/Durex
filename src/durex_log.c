@@ -6,41 +6,35 @@
 /*   By: abara <banthony@student.42.fr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/13 16:01:21 by abara             #+#    #+#             */
-/*   Updated: 2019/11/19 17:35:10 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/21 15:21:07 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <errno.h>
+#include <fcntl.h>
+#include <time.h>
+#include "libft.h"
 #include "durex_log.h"
 
 static int g_log_fd= -1;
 
+/*
+**	Constant that define string label for each log type.
+*/
+
 static const char *g_log_info[LOG_TYPE_NUMBER] =
 {
-	[LOG_INFO] = 	"INFO   ",
-	[LOG_WARNING] = "WARNING",
-	[LOG_ERROR] =	"ERROR  ",
+	LOG_TYPE(INFO),
+	LOG_TYPE(WARNING),
+	LOG_TYPE(ERROR),
 };
 
-#ifdef USE_SYSLOG
+/*
+**	This are basic home made logs functions.
+**	Compile with '-d USE_SYSLOG' to don't use them.
+*/
 
-void	durex_log(char *mess, t_log_type type)
-{
-	if (!mess)
-		(void)type;
-	(void)g_log_info;
-	(void)g_log_fd;
-	(void)type;
-}
-
-void	durex_log_with(char *mess, t_log_type type, t_prefix prefix, void *data)
-{
-	if (!mess || !data)
-		(void)type;
-	(void)type;
-	(void)prefix;
-}
-
-#else
+#ifndef USE_SYSLOG
 
 static void get_log_fd(void)
 {
@@ -63,6 +57,10 @@ static char	*get_time_string(char *time_format, size_t size)
 	return (time_buffer);
 }
 
+/*
+**	Print log message in log file.
+**	Format: [DD/MM/YYYY-HH:MM:SS] - [LOGTYPE] - [msg]
+*/
 void	durex_log(char *mess, t_log_type type)
 {
 	const char	*separator = " - ";
@@ -95,6 +93,10 @@ void	durex_log(char *mess, t_log_type type)
 	ft_strdel(&log);
 }
 
+/*
+**	Print log message with a prefix, in log file.
+**	Format: [DD/MM/YYYY-HH:MM:SS] - [LOGTYPE] - [prefix][msg]
+*/
 void	durex_log_with(char *mess, t_log_type type, t_prefix prefix, void *data)
 {
 	char	prefix_str[PREFIX_SIZE] = {0};
@@ -116,6 +118,30 @@ void	durex_log_with(char *mess, t_log_type type, t_prefix prefix, void *data)
 		return ;
 	}
 	durex_log(mess, type);
+}
+
+#else
+
+/*
+**	This section is reserved for the use of syslog.
+**	Not implemented for now, and may never be.
+*/
+
+void	durex_log(char *mess, t_log_type type)
+{
+	if (!mess)
+		(void)type;
+	(void)g_log_info;
+	(void)g_log_fd;
+	(void)type;
+}
+
+void	durex_log_with(char *mess, t_log_type type, t_prefix prefix, void *data)
+{
+	if (!mess || !data)
+		(void)type;
+	(void)type;
+	(void)prefix;
 }
 
 #endif

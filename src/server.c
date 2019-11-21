@@ -6,12 +6,21 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/20 16:54:24 by abara            ###   ########.fr       */
+/*   Updated: 2019/11/21 12:12:53 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
 #include "server.h"
 #include "durex_log.h"
+#include "message_digest.h"
+#include "Durex.h"
 
 /*
 **	Build client prefix string: 'Client[x.x.x.x]:'
