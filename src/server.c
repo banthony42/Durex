@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 11:06:03 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 12:13:49 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,7 +218,7 @@ static t_bool	client_handler(t_server *server, int fd)
 		if (fd == client->socket)
 		{
 			// use rcv instead
-			if ((ret = recv(fd, buf, READ_BUFFER_SIZE, 0)) <= 0)
+			if ((ret = recv(client->socket, buf, READ_BUFFER_SIZE, 0)) <= 0)
 				return (deco_client(client, server));
 			client->timestamp = time(NULL);
 			if (client->granted == false)
@@ -238,26 +238,35 @@ static t_bool	client_handler(t_server *server, int fd)
 	}
 	return (true);
 }
-#include<stdio.h>
+
 static void	kill_afk(t_server *server)
 {
 	time_t		now;
 	t_list		*lst;
 	t_client	*clt;
+	t_client	*target;
+	struct stat file;
 
 	lst = server->client_lst;
-	char str[255];
-	sprintf(str, "server:%d", server->socket);
-	durex_log(str, LOG_INFO);
 	while (lst)
 	{
 		clt = (t_client*)lst->content;
 		now = time(NULL);
-		sprintf(str, "clients fd:%d", clt->socket);
-		durex_log(str, LOG_INFO);
-		if (difftime(now, clt->timestamp) > 10)
-			deco_client(clt, server);
+		target = NULL;
+		ft_memset(&file, 0, sizeof(file));
+		if (clt->granted)
+			send_text(COLORIZE(SH_YELLOW, "Durex :")" Are you alive ?\n"SERVER_PROMPT, clt->socket);
+		else
+			send_text(COLORIZE(SH_YELLOW, "Durex :")" Are you alive ?\n"PASS_REQUEST, clt->socket);
+		if (difftime(now, clt->timestamp) > CLIENT_TIMEOUT || fstat(clt->socket, &file))
+			target = clt;
 		lst = lst->next;
+		if (target)
+		{
+			durex_log_with(TIMEOUT_MSG, LOG_INFO, client_prefix, clt);
+			send_text(TIMEOUT_MSG, target->socket);
+			deco_client(target, server);
+		}
 	}
 }
 
@@ -275,7 +284,7 @@ t_bool	server_loop(t_server *server)
 	while (42)
 	{
 		readfdset = server->fdset;
-		timeout = (struct timeval){10, 0};
+		timeout = (struct timeval){SERVER_REFRESH, 0};
 		if ((ret = select(FD_SETSIZE, &readfdset, NULL, NULL, &timeout)) < 0)
 		{
 			durex_log(SELECT_ERR, LOG_ERROR);

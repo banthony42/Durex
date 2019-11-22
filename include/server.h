@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/21 16:54:59 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 11:44:59 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,10 @@
 # define PASS_REQUEST "\xe2\x98\x82  - Enter password:"
 # define PASSWORD "d7767b86426ebd60a7e8c142160dad6d"
 
+# define SERVER_REFRESH 2
+# define CLIENT_TIMEOUT 10
+
+# define TIMEOUT_MSG " Timeout - afk more than " NAMEOF_CONTENT(CLIENT_TIMEOUT) " seconds."
 /*
 **	## - Concatenation operator
 **	(e.g.) Useful to implement dispatcher functions :

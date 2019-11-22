@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/21 17:26:34 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 11:59:22 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,6 +214,7 @@ void	server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_
 {
 	t_server_cmd cmd = -1;
 
+	ft_print_memory(raw_cmd, cmd_size);
 	raw_cmd[cmd_size - 1] = (raw_cmd[cmd_size - 1] == '\n') ? '\0' : raw_cmd[cmd_size - 1];
 	durex_log_with(raw_cmd, LOG_INFO, client_prefix, client);
 	while (++cmd < SERVER_CMD_NUMBER)

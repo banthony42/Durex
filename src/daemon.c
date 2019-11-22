@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/21 17:20:35 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 11:55:36 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,10 @@ static void	lock_daemon(void)
 		kill_daemon(EXIT_FAILURE);
 	}
 }
-
+#include "libft.h"
 void	signal_handler(int signal)
 {
+	durex_log(ft_itoa(signal), LOG_WARNING);
     switch (signal)
 	{
 		case SIGTERM:
@@ -145,7 +146,7 @@ t_bool		daemonize(const char *path)
 	lock_daemon();
 	signal_n  = -1;
 	while (++signal_n < 32)
-		signal(signal_n, SIG_IGN);
+		signal(signal_n, signal_handler);
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, signal_handler);
