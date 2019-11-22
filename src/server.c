@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/21 12:12:53 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 11:06:03 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <time.h>
 #include "server.h"
 #include "durex_log.h"
 #include "message_digest.h"
@@ -90,6 +91,7 @@ static t_bool	add_client(t_server *server, int cs, struct sockaddr_in csin)
 	new_client.socket = cs;
 	new_client.addr = inet_ntoa(csin.sin_addr);
 	new_client.granted = !server->require_pass;
+	new_client.timestamp = time(NULL);
 	if (!(nc = ft_lstnew(&new_client, sizeof(new_client))))
 	{
 		durex_log(ALLOC_ERR("Connexion aborted."), LOG_WARNING);
@@ -154,6 +156,7 @@ t_bool	deco_client(t_client *client, t_server *server)
 	elmt = server->client_lst;
 	if (!client || !server || !elmt)
 		return (false);
+	durex_log("Deco client !", LOG_INFO);
 	while (elmt)
 	{
 		stored_client = (t_client*)elmt->content;
@@ -217,6 +220,7 @@ static t_bool	client_handler(t_server *server, int fd)
 			// use rcv instead
 			if ((ret = recv(fd, buf, READ_BUFFER_SIZE, 0)) <= 0)
 				return (deco_client(client, server));
+			client->timestamp = time(NULL);
 			if (client->granted == false)
 			{
 				hash_pass = md5_digest((unsigned char*)buf, ret, 0);
@@ -234,11 +238,35 @@ static t_bool	client_handler(t_server *server, int fd)
 	}
 	return (true);
 }
+#include<stdio.h>
+static void	kill_afk(t_server *server)
+{
+	time_t		now;
+	t_list		*lst;
+	t_client	*clt;
+
+	lst = server->client_lst;
+	char str[255];
+	sprintf(str, "server:%d", server->socket);
+	durex_log(str, LOG_INFO);
+	while (lst)
+	{
+		clt = (t_client*)lst->content;
+		now = time(NULL);
+		sprintf(str, "clients fd:%d", clt->socket);
+		durex_log(str, LOG_INFO);
+		if (difftime(now, clt->timestamp) > 10)
+			deco_client(clt, server);
+		lst = lst->next;
+	}
+}
 
 t_bool	server_loop(t_server *server)
 {
 	int		i;
+	int		ret;
 	fd_set	readfdset;
+	struct	timeval timeout;
 
 	FD_ZERO(&readfdset);
 	FD_ZERO(&server->fdset);
@@ -247,7 +275,8 @@ t_bool	server_loop(t_server *server)
 	while (42)
 	{
 		readfdset = server->fdset;
-		if (select(FD_SETSIZE, &readfdset, NULL, NULL, NULL) < 0)
+		timeout = (struct timeval){10, 0};
+		if ((ret = select(FD_SETSIZE, &readfdset, NULL, NULL, &timeout)) < 0)
 		{
 			durex_log(SELECT_ERR, LOG_ERROR);
 			durex_log(strerror(errno), LOG_ERROR);
@@ -266,5 +295,7 @@ t_bool	server_loop(t_server *server)
 			else
 				client_handler(server, i);
 		}
+		if (ret == 0)
+			kill_afk(server);
 	}
 }

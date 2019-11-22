@@ -6,12 +6,9 @@
      By: banthony <banthony@student.42.fr>          +#+  +:+       +#+
                                                   +#+#+#+#+#+   +#+
      Created: 2019/11/08 18:43:57 by banthony          #+#    #+#
-     Updated: 2019/11/21 13:06:16 by banthony         ###   ########.fr         
+     Updated: 2019/11/21 16:23:13 by banthony         ###   ########.fr         
 
 ********************************************************************************
-
-*	Clean the code / try to separate durex part from server part
-*	Add utils info in help, the way to uninstall, reinstall manually using shell cmd
 
 BONUS:
 *	Implement keylogger ?
@@ -25,9 +22,8 @@ BUGS:
 *	Ctrl + D ne fait pas quitter pas le client (close(socket))
 *	Parfois impossible de se connecter au shell qui a spawn
 *	Faire appel a kill daemon pour exit
-*	Demander validation pour un uninstall
-	Appeller kill_daemon apres uninstall et prevenir que Durex va quitter
 *	If log file is delete, log message are lost, try to recreate log file.
+*	Fix client addr string bug
 
 REF:
 https://support.rackspace.com/how-to/checking-running-services-on-linux/
