@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 12:13:49 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 17:27:07 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,13 +137,6 @@ t_bool	new_client(t_server *server)
 		return (false);
 	}
 	return (add_client(server, cs, csin));
-}
-
-static void		del_client(void *data, size_t size)
-{
-	if (!data)
-		return ;
-	(void)size;
 }
 
 t_bool	deco_client(t_client *client, t_server *server)
@@ -285,11 +278,11 @@ t_bool	server_loop(t_server *server)
 	{
 		readfdset = server->fdset;
 		timeout = (struct timeval){SERVER_REFRESH, 0};
+		(!timeout.tv_sec) ? (timeout.tv_sec++) : ((void)i);
 		if ((ret = select(FD_SETSIZE, &readfdset, NULL, NULL, &timeout)) < 0)
 		{
 			durex_log(SELECT_ERR, LOG_ERROR);
 			durex_log(strerror(errno), LOG_ERROR);
-			return (false);
 		}
 		i = -1;
 		while (++i < FD_SETSIZE)

@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 11:55:36 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 17:19:14 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static void	fork_and_kill_dad(void)
 		exit(EXIT_SUCCESS);
 }
 
-static void	close_all_file_descriptor(void)
+/*static void	close_all_file_descriptor(void)
 {
     int number_of_fd;
 	int fd;
@@ -66,7 +66,7 @@ static void	close_all_file_descriptor(void)
 		durex_log(strerror(errno), LOG_ERROR);
 		exit(EXIT_FAILURE);
 	}
-}
+	}*/
 
 static void	lock_daemon(void)
 {
@@ -86,10 +86,19 @@ static void	lock_daemon(void)
 		kill_daemon(EXIT_FAILURE);
 	}
 }
-#include "libft.h"
+
+void		kill_daemon(int status)
+{
+    if (remove(DUREX_LOCK))
+		durex_log("Fail to delete file lock.", LOG_WARNING);
+	else
+		durex_log("Daemon successfully killed.", LOG_INFO);
+	exit(status);
+}
+
 void	signal_handler(int signal)
 {
-	durex_log(ft_itoa(signal), LOG_WARNING);
+	//	durex_log(ft_itoa(signal), LOG_WARNING);
     switch (signal)
 	{
 		case SIGTERM:
@@ -109,18 +118,10 @@ void	signal_handler(int signal)
 	}
 }
 
-void		kill_daemon(int status)
-{
-    if (remove(DUREX_LOCK))
-		durex_log("Fail to delete file lock.", LOG_WARNING);
-	else
-		durex_log("Daemon successfully killed.", LOG_INFO);
-	exit(status);
-}
-
 t_bool		daemonize(const char *path)
 {
-	int		signal_n;
+	int					signal_n;
+	struct sigaction	act = {0};
 
 	if (!access(DUREX_LOCK, F_OK) || !path)
 	{
@@ -134,7 +135,7 @@ t_bool		daemonize(const char *path)
 		durex_log(strerror(errno), LOG_ERROR);
 		exit(EXIT_FAILURE);
 	}
-	close_all_file_descriptor();
+	//	close_all_file_descriptor();
 	fork_and_kill_dad();
 	umask(077);
 	if (chdir(path) < 0)
@@ -145,11 +146,13 @@ t_bool		daemonize(const char *path)
 	}
 	lock_daemon();
 	signal_n  = -1;
+	act.sa_handler = SIG_IGN;
 	while (++signal_n < 32)
-		signal(signal_n, signal_handler);
-	signal(SIGTERM, signal_handler);
-	signal(SIGINT, signal_handler);
-	signal(SIGQUIT, signal_handler);
-	signal(SIGKILL, signal_handler);
+		sigaction(signal_n, &act, NULL);
+	act.sa_flags = SA_RESTART;
+	act.sa_handler = signal_handler;
+	sigaction(SIGTERM, &act, NULL);
+	sigaction(SIGINT, &act, NULL);
+	sigaction(SIGQUIT, &act, NULL);
 	return (true);
 }

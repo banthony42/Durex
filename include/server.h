@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 11:44:59 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/22 17:26:50 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@
 # define PASS_REQUEST "\xe2\x98\x82  - Enter password:"
 # define PASSWORD "d7767b86426ebd60a7e8c142160dad6d"
 
-# define SERVER_REFRESH 2
-# define CLIENT_TIMEOUT 10
+# define SERVER_REFRESH 10
+# define CLIENT_TIMEOUT 30
 
 # define TIMEOUT_MSG " Timeout - afk more than " NAMEOF_CONTENT(CLIENT_TIMEOUT) " seconds."
 /*
@@ -92,5 +92,6 @@ t_bool			client_prefix(void *data, char (*prefix)[PREFIX_SIZE]);
 void			server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_client *client);
 t_bool			create_server(t_server *server, int port, size_t client_limit);
 t_bool			server_loop(t_server *server);
+void			del_client(void *data, size_t size);
 
 #endif
