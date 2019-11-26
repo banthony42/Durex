@@ -6,7 +6,7 @@
      By: banthony <banthony@student.42.fr>          +#+  +:+       +#+
                                                   +#+#+#+#+#+   +#+
      Created: 2019/11/08 18:43:57 by banthony          #+#    #+#
-     Updated: 2019/11/22 12:18:22 by banthony         ###   ########.fr         
+     Updated: 2019/11/26 18:55:50 by banthony         ###   ########.fr         
 
 ********************************************************************************
 
@@ -23,7 +23,7 @@ IDEES:
 *	Implement cam view ?
 
 BUGS:
-*	Parfois impossible de se connecter au shell qui a spawn
+*	Hunt leaks
 *	Faire appel a kill daemon pour exit
 *	If log file is delete, log message are lost, try to recreate log file.
 *	Fix client addr string bug

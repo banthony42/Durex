@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 17:19:14 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/26 18:30:11 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@ void		kill_daemon(int status)
 
 void	signal_handler(int signal)
 {
-	//	durex_log(ft_itoa(signal), LOG_WARNING);
     switch (signal)
 	{
 		case SIGTERM:
@@ -110,8 +109,8 @@ void	signal_handler(int signal)
 		case SIGQUIT:
 			durex_log("SIGQUIT", LOG_WARNING);
 			kill_daemon(EXIT_SUCCESS);
-		case SIGKILL:
-			durex_log("SIGKILL", LOG_WARNING);
+		case SIGUSR1:
+			durex_log("SIGUSR1", LOG_WARNING);
 			kill_daemon(EXIT_SUCCESS);
 		default:
 		 	break;
@@ -154,5 +153,6 @@ t_bool		daemonize(const char *path)
 	sigaction(SIGTERM, &act, NULL);
 	sigaction(SIGINT, &act, NULL);
 	sigaction(SIGQUIT, &act, NULL);
+	sigaction(SIGUSR1, &act, NULL);
 	return (true);
 }

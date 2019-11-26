@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 16:53:43 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/26 18:55:02 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,11 @@ static t_bool	server_cmd_shell(t_client *client, t_server *server)
 			close(client->socket);
 			while (1)
 			{
-				new_client(&remote_shell);
+				if (!new_client(&remote_shell))
+				{
+					send_text(COLORIZE(SH_RED, "\t• ") "Failed, to connect.\n", client->socket);
+					continue ;
+				}
 				clt = (t_client*)remote_shell.client_lst->content;
 				dup2(clt->socket, 0);
 				dup2(clt->socket, 1);

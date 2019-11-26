@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:28:52 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 17:27:14 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/26 18:16:41 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ void		del_client(void *data, size_t size)
 	if ((clt = (t_client*)data))
 	{
 		close(clt->socket);
+		free(data);
+		data = NULL;
 	}
 }
 
@@ -45,9 +47,12 @@ static void		free_at_exit(int status, void *data)
 	durex_log("======== Durex quitting ...  ========", LOG_WARNING);
 	if (!(server = (t_server*)data))
 		return ;
+	durex_log("======== Durex deleting data ...  ========", LOG_WARNING);
 	(void)status;
 	if (server->client_lst)
+	{
 		ft_lstdel(&server->client_lst, del_client);
+	}
 }
 
 int main(int ac, char **av)

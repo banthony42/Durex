@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 17:27:07 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/26 18:57:13 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ static t_bool	add_client(t_server *server, int cs, struct sockaddr_in csin)
 		close(cs);
 		return (false);
 	}
-
+	nc->next = NULL;
 	if (server->client_lst == NULL)
 		server->client_lst = nc;
 	else
@@ -119,8 +119,8 @@ static t_bool	add_client(t_server *server, int cs, struct sockaddr_in csin)
 t_bool	new_client(t_server *server)
 {
 	int					cs;
-	unsigned int		cs_len;
-	struct sockaddr_in	csin;
+	unsigned int		cs_len = sizeof(struct sockaddr_in);
+	struct sockaddr_in	csin = {0};
 
 	if ((cs = accept(server->socket, (struct sockaddr*)&csin, &cs_len)) < 0)
 	{
@@ -150,6 +150,16 @@ t_bool	deco_client(t_client *client, t_server *server)
 	if (!client || !server || !elmt)
 		return (false);
 	durex_log("Deco client !", LOG_INFO);
+	if (!server->client_lst->next)
+	{
+		FD_CLR(client->socket, &server->fdset);
+		close(client->socket);
+		durex_log_with(DISCONNECTED, LOG_INFO, client_prefix, client);
+		server->clients--;
+		ft_lstdel(&server->client_lst, del_client);
+		durex_log("one client", LOG_INFO);
+		return (true);
+	}
 	while (elmt)
 	{
 		stored_client = (t_client*)elmt->content;
@@ -180,7 +190,7 @@ t_bool	create_server(t_server *server, int port, size_t client_limit)
 	int					sock;
 	struct sockaddr_in	sin;
 
-	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(port);
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);

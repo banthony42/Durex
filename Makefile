@@ -6,7 +6,7 @@
 #    By: banthony <banthony@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/06 13:17:44 by banthony          #+#    #+#              #
-#    Updated: 2019/11/21 12:22:15 by banthony         ###   ########.fr        #
+#    Updated: 2019/11/26 19:02:11 by banthony         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -76,11 +76,11 @@ $(NAME): $(SRC) $(INCLUDE)
 
 normal: $(SRC) $(INCLUDE)
 	make -C $(LIBFT)
-	gcc $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) $(DEFINE)
+	gcc -g $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) $(DEFINE)
 	mkdir -p $(OBJ_PATH)
 	mv $(OBJ) $(OBJ_PATH)
-	gcc $(FLAGS) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME) -o $(NAME) $(OTHER_LIB) $(DEFINE)
-	@echo "\033[32m•\033[0m $(NAME) ready
+	gcc -g $(FLAGS) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME) -o $(NAME) $(OTHER_LIB) $(DEFINE)
+	@echo "\033[32m•\033[0m $(NAME) ready"
 
 clean:
 	make clean -C $(LIBFT)

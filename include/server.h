@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/22 17:26:50 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/26 18:55:17 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 # define PASS_REQUEST "\xe2\x98\x82  - Enter password:"
 # define PASSWORD "d7767b86426ebd60a7e8c142160dad6d"
 
-# define SERVER_REFRESH 10
+# define SERVER_REFRESH 8
 # define CLIENT_TIMEOUT 30
 
 # define TIMEOUT_MSG " Timeout - afk more than " NAMEOF_CONTENT(CLIENT_TIMEOUT) " seconds."
