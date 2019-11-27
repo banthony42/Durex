@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/26 18:55:02 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/27 13:03:01 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,7 @@ static t_bool	server_cmd_uninstall(t_client *client, t_server *server)
 		COLORIZE(SH_PINK, "• ") "Quitting ...\n", client->socket);
 		durex_log("durex service has been removed from system.", LOG_WARNING);
 		durex_log("Quitting ...", LOG_INFO);
+		ft_lstdel(&server->client_lst, del_client);
 		kill_daemon(EXIT_SUCCESS);
 	}
 	send_text("Uninstall Durex: " COLORIZE(SH_RED, "• ") "Failed.\n"
@@ -222,7 +223,11 @@ void	server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_
 	while (++cmd < SERVER_CMD_NUMBER)
 	{
 		if (!ft_strncmp(g_server_cmd[cmd].name, raw_cmd, cmd_size))
+		{
 			g_server_cmd[cmd].func(client, server);
+			break ;
+		}
 	}
-	send_text(SERVER_PROMPT, client->socket);
+	if (cmd != EXIT)
+		send_text(SERVER_PROMPT, client->socket);
 }

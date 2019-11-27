@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/26 18:57:13 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/27 12:46:19 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,13 +83,14 @@ static void		welcome_client(t_client *clt)
 	durex_log_with(CLIENT_LOG, LOG_INFO, client_prefix, clt);
 }
 
-static t_bool	add_client(t_server *server, int cs, struct sockaddr_in csin)
+static t_bool	add_client(t_server *server, int cs, struct sockaddr_in *csin)
 {
 	t_list		*nc;
 	t_client	new_client;
+	struct in_addr ip_addr = csin->sin_addr;
 
 	new_client.socket = cs;
-	new_client.addr = inet_ntoa(csin.sin_addr);
+	inet_ntop( AF_INET, &ip_addr, new_client.addr, INET_ADDRSTRLEN );
 	new_client.granted = !server->require_pass;
 	new_client.timestamp = time(NULL);
 	if (!(nc = ft_lstnew(&new_client, sizeof(new_client))))
@@ -100,7 +101,6 @@ static t_bool	add_client(t_server *server, int cs, struct sockaddr_in csin)
 		close(cs);
 		return (false);
 	}
-	nc->next = NULL;
 	if (server->client_lst == NULL)
 		server->client_lst = nc;
 	else
@@ -136,7 +136,7 @@ t_bool	new_client(t_server *server)
 		close(cs);
 		return (false);
 	}
-	return (add_client(server, cs, csin));
+	return (add_client(server, cs, (struct sockaddr_in*)&csin));
 }
 
 t_bool	deco_client(t_client *client, t_server *server)
@@ -146,10 +146,11 @@ t_bool	deco_client(t_client *client, t_server *server)
 	t_client	*stored_client;
 
 	prev = NULL;
-	elmt = server->client_lst;
-	if (!client || !server || !elmt)
+	if (!client || !server)
 		return (false);
-	durex_log("Deco client !", LOG_INFO);
+	if (!(elmt = server->client_lst))
+		return (false);
+	durex_log("Deco client ...", LOG_INFO);
 	if (!server->client_lst->next)
 	{
 		FD_CLR(client->socket, &server->fdset);

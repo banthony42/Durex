@@ -6,7 +6,7 @@
 /*   By: abara <banthony@student.42.fr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/13 16:01:21 by abara             #+#    #+#             */
-/*   Updated: 2019/11/21 15:21:07 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/27 11:40:12 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void	durex_log(char *mess, t_log_type type)
 	char		*time_string;
 	size_t		log_size;
 
-	if (g_log_fd < 0)
+	if (g_log_fd < 0 || access(DUREX_LOG_FILE, F_OK))
 		get_log_fd();
 	if (g_log_fd < 0)
 		return ;
@@ -102,7 +102,7 @@ void	durex_log_with(char *mess, t_log_type type, t_prefix prefix, void *data)
 	char	prefix_str[PREFIX_SIZE] = {0};
 	char	*full_mess;
 
-	if (g_log_fd < 0)
+	if (g_log_fd < 0 || access(DUREX_LOG_FILE, F_OK))
 		get_log_fd();
 	if (g_log_fd < 0 || !data || !mess)
 		return ;

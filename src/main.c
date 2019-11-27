@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:28:52 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/26 18:16:41 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/27 12:54:40 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,14 @@ static t_bool	is_root(char *bin)
 void		del_client(void *data, size_t size)
 {
 	t_client *clt;
-	if (data || size)
+
+	if (!data)
 		return ;
+	(void)size;
 	if ((clt = (t_client*)data))
 	{
 		close(clt->socket);
-		free(data);
-		data = NULL;
+		ft_memdel(&data);
 	}
 }
 

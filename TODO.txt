@@ -6,7 +6,7 @@
      By: banthony <banthony@student.42.fr>          +#+  +:+       +#+
                                                   +#+#+#+#+#+   +#+
      Created: 2019/11/08 18:43:57 by banthony          #+#    #+#
-     Updated: 2019/11/26 18:55:50 by banthony         ###   ########.fr         
+     Updated: 2019/11/27 13:04:45 by banthony         ###   ########.fr         
 
 ********************************************************************************
 
@@ -21,12 +21,6 @@ IDEES:
 *	Implement screenshot ?
 *	Implement listen mic ?
 *	Implement cam view ?
-
-BUGS:
-*	Hunt leaks
-*	Faire appel a kill daemon pour exit
-*	If log file is delete, log message are lost, try to recreate log file.
-*	Fix client addr string bug
 
 REF:
 https://support.rackspace.com/how-to/checking-running-services-on-linux/

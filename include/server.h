@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/26 18:55:17 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/27 11:47:27 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "utils.h"
 #include "libft.h"
 #include "durex_log.h"
-
+#include<arpa/inet.h>
 
 # define MAX_PENDING_CLIENT 3
 
@@ -62,7 +62,7 @@ typedef struct	s_client
 	t_bool		granted;
 	int			socket;
 	time_t		timestamp;
-	char		*addr;
+	char		addr[INET_ADDRSTRLEN];
 }				t_client;
 
 typedef enum	e_server_cmd
