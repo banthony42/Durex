@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/26 18:30:11 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/28 13:12:12 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static void	fork_and_kill_dad(void)
 		exit(EXIT_SUCCESS);
 }
 
-/*static void	close_all_file_descriptor(void)
+static void	close_all_file_descriptor(void)
 {
     int number_of_fd;
 	int fd;
@@ -66,7 +66,7 @@ static void	fork_and_kill_dad(void)
 		durex_log(strerror(errno), LOG_ERROR);
 		exit(EXIT_FAILURE);
 	}
-	}*/
+}
 
 static void	lock_daemon(void)
 {
@@ -109,9 +109,6 @@ void	signal_handler(int signal)
 		case SIGQUIT:
 			durex_log("SIGQUIT", LOG_WARNING);
 			kill_daemon(EXIT_SUCCESS);
-		case SIGUSR1:
-			durex_log("SIGUSR1", LOG_WARNING);
-			kill_daemon(EXIT_SUCCESS);
 		default:
 		 	break;
 	}
@@ -134,7 +131,7 @@ t_bool		daemonize(const char *path)
 		durex_log(strerror(errno), LOG_ERROR);
 		exit(EXIT_FAILURE);
 	}
-	//	close_all_file_descriptor();
+	close_all_file_descriptor();
 	fork_and_kill_dad();
 	umask(077);
 	if (chdir(path) < 0)

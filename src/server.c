@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/27 12:46:19 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/28 13:15:07 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 
 /*
 **	Build client prefix string: 'Client[x.x.x.x]:'
+**	7 = strlen("Client["); 2 = strlen("]:");
 */
 t_bool	client_prefix(void *data, char (*prefix)[PREFIX_SIZE])
 {
@@ -51,27 +52,8 @@ static void		welcome_client(t_client *clt)
 	char *durex_header;
 	char *shell_header;
 
-	durex_header =	"/* ************************************************************************** */\n"
-					"/*                                                        :::      ::::::::   */\n"
-					"/*  \xe2\x98\xa0  - WELCOME TO DUREX - \xe2\x98\xa0"
-										"                           :+:      :+:    :+:   */\n"
-					"/*                                                    +:+ +:+         +:+     */\n"
-					"/*      * 3 clients max                             +#+  +:+       +#+        */\n"
-					"/*      * Enter 'help' to see all commands        +#+#+#+#+#+   +#+           */\n"
-					"/*                                                     #+#    #+#             */\n"
-					"/*                                                    ###   ########          */\n"
-					"/* ************************************************************************** */\n"
-					"\nDurex>";
-	shell_header =	"/* ************************************************************************** */\n"
-					"/*                                                        :::      ::::::::   */\n"
-					"/*  \xe2\x98\xa0  - WELCOME TO DUREX - \xe2\x98\xa0"
-												"                           :+:      :+:    :+:   */\n"
-					"/*                                                    +:+ +:+         +:+     */\n"
-					"/*      * Spawn /bin/sh on port 4343                +#+  +:+       +#+        */\n"
-					"/*                                                +#+#+#+#+#+   +#+           */\n"
-					"/*                                                     #+#    #+#             */\n"
-					"/*                                                    ###   ########          */\n"
-					"/* ************************************************************************** */\n";
+	durex_header =	DUREX_HEADER SERVER_PROMPT;
+	shell_header =	DUREX_SHELL_HEADER;
 
 	if (!clt->granted)
 	{
@@ -119,9 +101,10 @@ static t_bool	add_client(t_server *server, int cs, struct sockaddr_in *csin)
 t_bool	new_client(t_server *server)
 {
 	int					cs;
-	unsigned int		cs_len = sizeof(struct sockaddr_in);
+	unsigned int		cs_len;
 	struct sockaddr_in	csin = {0};
 
+	cs_len = sizeof(struct sockaddr_in);
 	if ((cs = accept(server->socket, (struct sockaddr*)&csin, &cs_len)) < 0)
 	{
 		durex_log(ACCEPT_ERR, LOG_ERROR);
@@ -151,16 +134,6 @@ t_bool	deco_client(t_client *client, t_server *server)
 	if (!(elmt = server->client_lst))
 		return (false);
 	durex_log("Deco client ...", LOG_INFO);
-	if (!server->client_lst->next)
-	{
-		FD_CLR(client->socket, &server->fdset);
-		close(client->socket);
-		durex_log_with(DISCONNECTED, LOG_INFO, client_prefix, client);
-		server->clients--;
-		ft_lstdel(&server->client_lst, del_client);
-		durex_log("one client", LOG_INFO);
-		return (true);
-	}
 	while (elmt)
 	{
 		stored_client = (t_client*)elmt->content;
@@ -204,6 +177,7 @@ t_bool	create_server(t_server *server, int port, size_t client_limit)
 	server->client_limit = client_limit;
 	server->port = port;
 	server->socket = sock;
+	server->start_time = time(NULL);
 	return (true);
 }
 
@@ -221,7 +195,6 @@ static t_bool	client_handler(t_server *server, int fd)
 		client = (t_client*)elmt->content;
 		if (fd == client->socket)
 		{
-			// use rcv instead
 			if ((ret = recv(client->socket, buf, READ_BUFFER_SIZE, 0)) <= 0)
 				return (deco_client(client, server));
 			client->timestamp = time(NULL);
@@ -259,9 +232,9 @@ static void	kill_afk(t_server *server)
 		target = NULL;
 		ft_memset(&file, 0, sizeof(file));
 		if (clt->granted)
-			send_text(COLORIZE(SH_YELLOW, "Durex :")" Are you alive ?\n"SERVER_PROMPT, clt->socket);
+			send_text(COLORIZE(SH_YELLOW, "\tDurex :")" Are you alive ?\n"SERVER_PROMPT, clt->socket);
 		else
-			send_text(COLORIZE(SH_YELLOW, "Durex :")" Are you alive ?\n"PASS_REQUEST, clt->socket);
+			send_text(COLORIZE(SH_YELLOW, "\tDurex :")" Are you alive ?\n"PASS_REQUEST, clt->socket);
 		if (difftime(now, clt->timestamp) > CLIENT_TIMEOUT || fstat(clt->socket, &file))
 			target = clt;
 		lst = lst->next;
@@ -301,7 +274,7 @@ t_bool	server_loop(t_server *server)
 			// Does this descriptor is ready for read ?
 			if (FD_ISSET(i, &readfdset) == 0)
 				continue;
-				// If it correspond to the server descriptor, handle a new connexion
+			// If it correspond to the server descriptor, handle a new connexion
 			if (FD_ISSET(server->socket, &readfdset))
 				new_client(server);
 			// Otherwise, handle client data
