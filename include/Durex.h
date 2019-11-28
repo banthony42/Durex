@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:18 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/27 15:15:48 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/28 16:28:54 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,9 @@
 
 # define MAX_CLIENT 3
 
-#define EXEC_COMMAND(CMD) exec_command(CMD, NAMEOF(CMD)" ...")
+#define EXEC_COMMAND(CMD) exec_command(CMD, NAMEOF(CMD)" ...", NULL)
 
+t_bool	exec_command(char **command, char *info, char **env);
 void	install_service(char *bin_path);
 t_bool	durex_is_installed(void);
 t_bool	uninstall_service(void);

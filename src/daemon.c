@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:06 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/28 13:12:12 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/28 16:16:39 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ static void	fork_and_kill_dad(void)
 	else if (child > 0)
 		exit(EXIT_SUCCESS);
 }
+
+#ifndef FD_ON
 
 static void	close_all_file_descriptor(void)
 {
@@ -67,6 +69,8 @@ static void	close_all_file_descriptor(void)
 		exit(EXIT_FAILURE);
 	}
 }
+
+#endif
 
 static void	lock_daemon(void)
 {
@@ -131,7 +135,9 @@ t_bool		daemonize(const char *path)
 		durex_log(strerror(errno), LOG_ERROR);
 		exit(EXIT_FAILURE);
 	}
+#ifndef FD_ON
 	close_all_file_descriptor();
+#endif
 	fork_and_kill_dad();
 	umask(077);
 	if (chdir(path) < 0)

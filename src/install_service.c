@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:45:56 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/21 12:59:53 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/28 16:28:31 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 
 extern char **environ;
 
-static t_bool	exec_command(char **command, char *info)
+t_bool	exec_command(char **command, char *info, char **env)
 {
 	pid_t		pid;
 
@@ -36,7 +36,10 @@ static t_bool	exec_command(char **command, char *info)
 	else if (pid == 0)
 	{
 		durex_log(info, LOG_INFO);
-		execve(command[0], command, environ);
+		if (!env)
+			execve(command[0], command, environ);
+		else
+			execve(command[0], command, env);
 		durex_log(strerror(errno), LOG_ERROR);
 		exit(EXIT_FAILURE);
 	}

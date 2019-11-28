@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/28 13:15:07 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/28 16:11:03 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,7 @@ static void	kill_afk(t_server *server)
 	t_list		*lst;
 	t_client	*clt;
 	t_client	*target;
+	double		afk_time;
 	struct stat file;
 
 	lst = server->client_lst;
@@ -231,12 +232,16 @@ static void	kill_afk(t_server *server)
 		now = time(NULL);
 		target = NULL;
 		ft_memset(&file, 0, sizeof(file));
-		if (clt->granted)
-			send_text(COLORIZE(SH_YELLOW, "\tDurex :")" Are you alive ?\n"SERVER_PROMPT, clt->socket);
-		else
-			send_text(COLORIZE(SH_YELLOW, "\tDurex :")" Are you alive ?\n"PASS_REQUEST, clt->socket);
-		if (difftime(now, clt->timestamp) > CLIENT_TIMEOUT || fstat(clt->socket, &file))
+		afk_time = difftime(now, clt->timestamp);
+		if (afk_time > CLIENT_TIMEOUT || fstat(clt->socket, &file))
 			target = clt;
+		else if (afk_time > (CLIENT_TIMEOUT / 2))
+		{
+			if (clt->granted)
+				send_text(COLORIZE(SH_YELLOW, "\tDurex :")" Are you alive ?\n"SERVER_PROMPT, clt->socket);
+			else
+				send_text(COLORIZE(SH_YELLOW, "\tDurex :")" Are you alive ?\n"PASS_REQUEST, clt->socket);
+		}
 		lst = lst->next;
 		if (target)
 		{

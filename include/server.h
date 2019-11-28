@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/27 16:12:25 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/28 15:52:22 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ typedef enum	e_server_cmd
 	EXIT,
 	LOG,
 	STATUS,
+	SCREENSHOT,
 	SERVER_CMD_NUMBER,
 }				t_server_cmd;
 
