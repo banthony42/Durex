@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:29:18 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/28 16:28:54 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/29 13:35:15 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,15 @@
 
 # define MAX_CLIENT 3
 
-#define EXEC_COMMAND(CMD) exec_command(CMD, NAMEOF(CMD)" ...", NULL)
+# define VIDEO_RECORD_TIME 5
 
-t_bool	exec_command(char **command, char *info, char **env);
+# define VIDEO_RECORD_LIMIT 6
+
+#define EXEC_COMMAND(CMD) exec_command(CMD, NAMEOF(CMD)" ...", NULL, -1)
+
+#define EXEC_COMMAND_DUP(CMD, FD) exec_command(CMD, NAMEOF(CMD)" ...", NULL, FD)
+
+t_bool	exec_command(char **command, char *info, char **env, int fd);
 void	install_service(char *bin_path);
 t_bool	durex_is_installed(void);
 t_bool	uninstall_service(void);

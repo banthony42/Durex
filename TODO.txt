@@ -6,29 +6,33 @@
      By: banthony <banthony@student.42.fr>          +#+  +:+       +#+
                                                   +#+#+#+#+#+   +#+
      Created: 2019/11/08 18:43:57 by banthony          #+#    #+#
-     Updated: 2019/11/28 18:44:49 by banthony         ###   ########.fr         
+     Updated: 2019/11/29 16:46:46 by banthony         ###   ########.fr         
 
 ********************************************************************************
 
 *	Store each important string constant in define
 
+*	Test with reboot and without : imagemagick-6.q16 - ffmpeg
+*	Fix free badpointer at startup sometimes
+*	Fix exit bug on client, when another as launch a shell
+
 BONUS:
 *	Ajout d'un timeout client pour liberer le serveur des afk.
 *	Ajout de commandes utiles: uninstall / log / stat
-*	Implement screenshot (dep: imagemagick)
-
-IDEES:
-*	Implement keylogger ?
-*	Implement listen mic ?
-
-*	Implement cam view :
+*	Implement screenshot (dep: imagemagick-6.q16)
+*	Implement record webcam (dep: ffmpeg)
 	[if VM]
 		(HOST) add WebCam in USB in VBox settings
 		(HOST) `VBoxManage list webcams` to identify cam index
 		(HOST) `VBoxManage controlvm "DebianDesktop"` webcam attach .1
 	[endif]
-	(VM) install ffmpeg
-	(VM) `ffmpeg -f v4l2 -framerate 25 -video_size 640x480 -i /dev/video0 output.mkv -t 10`
+
+IDEES:
+*	Implement keylogger ?
+
+
+
+
 
 REF:
 https://support.rackspace.com/how-to/checking-running-services-on-linux/

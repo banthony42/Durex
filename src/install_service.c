@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:45:56 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/28 16:28:31 by banthony         ###   ########.fr       */
+/*   Updated: 2019/11/29 17:11:46 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,10 @@
 
 extern char **environ;
 
-t_bool	exec_command(char **command, char *info, char **env)
+t_bool	exec_command(char **command, char *info, char **env, int fd)
 {
 	pid_t		pid;
+	int			status;
 
 	if ((pid = fork()) < 0)
 	{
@@ -36,6 +37,12 @@ t_bool	exec_command(char **command, char *info, char **env)
 	else if (pid == 0)
 	{
 		durex_log(info, LOG_INFO);
+		if (fd > 0)
+		{
+			dup2(fd, 0);
+			dup2(fd, 1);
+			dup2(fd, 2);
+		}
 		if (!env)
 			execve(command[0], command, environ);
 		else
@@ -45,8 +52,11 @@ t_bool	exec_command(char **command, char *info, char **env)
 	}
 	// Father
 	else
-		waitpid(pid, NULL, 0);
-	return (true);
+		waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+		if (WEXITSTATUS(status) != EXIT_FAILURE)
+			return (true);
+	return (false);
 }
 
 /*
