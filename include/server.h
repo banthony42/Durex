@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/29 15:55:16 by banthony         ###   ########.fr       */
+/*   Updated: 2019/12/02 11:52:11 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ typedef struct	s_cmd
 	t_cmd_func	func;
 }				t_cmd;
 
+t_client		*find_client(t_server *server, int target);
 void			send_text(char *text, int socket);
 t_bool			new_client(t_server *server);
 t_bool			deco_client(t_client *client, t_server *server);

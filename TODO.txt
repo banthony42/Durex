@@ -11,10 +11,8 @@
 ********************************************************************************
 
 *	Store each important string constant in define
-
 *	Test with reboot and without : imagemagick-6.q16 - ffmpeg
 *	Fix free badpointer at startup sometimes
-*	Fix exit bug on client, when another as launch a shell
 
 BONUS:
 *	Ajout d'un timeout client pour liberer le serveur des afk.
@@ -26,6 +24,13 @@ BONUS:
 		(HOST) `VBoxManage list webcams` to identify cam index
 		(HOST) `VBoxManage controlvm "DebianDesktop"` webcam attach .1
 	[endif]
+
+NOTES:
+*	Connect client A;
+	Connect client B;
+	client A: shell;
+	client B: exit;
+	-> client B bien deco mais netcat ne quitte pas.
 
 IDEES:
 *	Implement keylogger ?

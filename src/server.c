@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:44:24 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/28 16:11:03 by banthony         ###   ########.fr       */
+/*   Updated: 2019/12/02 11:51:59 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,24 @@ t_bool	new_client(t_server *server)
 		return (false);
 	}
 	return (add_client(server, cs, (struct sockaddr_in*)&csin));
+}
+
+t_client	*find_client(t_server *server, int target)
+{
+	t_client	*clt;
+	t_list		*tmp;
+
+	clt = NULL;
+	if (!server || !(tmp = server->client_lst) || target < 0)
+		return (NULL);
+	while (tmp)
+	{
+		if ((clt = (t_client*)tmp->content))
+			if (clt->socket == target)
+				return (clt);
+		tmp = tmp->next;
+	}
+	return (NULL);
 }
 
 t_bool	deco_client(t_client *client, t_server *server)

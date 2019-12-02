@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 13:28:52 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/27 12:54:40 by banthony         ###   ########.fr       */
+/*   Updated: 2019/12/02 12:32:30 by abara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,5 +76,7 @@ int main(int ac, char **av)
 	server.require_pass = true;
 	if (create_server(&server, 4242, MAX_CLIENT))
 		server_loop(&server);
+	else
+		kill_daemon(EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
