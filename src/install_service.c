@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:45:56 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/29 17:11:46 by banthony         ###   ########.fr       */
+/*   Updated: 2019/12/04 14:15:43 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,6 @@ static t_bool copy_file(char *src, char *dst)
 
 t_bool uninstall_service(void)
 {
-	char	*stop_durex[] = {"/bin/systemctl", "stop", "durex", NULL};
 	char	*disable_durex[] = {"/bin/systemctl", "disable", "durex", NULL};
 	char	*systemctl_reload[] = { "/bin/systemctl", "daemon-reload", NULL};
 	char	*systemctl_reset[] = {"/bin/systemctl", "reset-failed", NULL};
@@ -156,7 +155,6 @@ t_bool uninstall_service(void)
 		durex_log("Fail to delete:" SERVICE_BIN, LOG_WARNING);
 		durex_log(strerror(errno), LOG_WARNING);
 	}
-	EXEC_COMMAND(stop_durex);
 	EXEC_COMMAND(disable_durex);
 	EXEC_COMMAND(systemctl_reload);
 	EXEC_COMMAND(systemctl_reset);

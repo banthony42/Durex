@@ -6,11 +6,10 @@
      By: banthony <banthony@student.42.fr>          +#+  +:+       +#+
                                                   +#+#+#+#+#+   +#+
      Created: 2019/11/08 18:43:57 by banthony          #+#    #+#
-     Updated: 2019/11/29 16:46:46 by banthony         ###   ########.fr         
+     Updated: 2019/12/04 13:19:20 by banthony         ###   ########.fr         
 
 ********************************************************************************
 
-*	Store each important string constant in define
 *	Test with reboot and without : imagemagick-6.q16 - ffmpeg
 *	Fix free badpointer at startup sometimes
 

