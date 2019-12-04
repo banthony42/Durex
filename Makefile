@@ -6,7 +6,7 @@
 #    By: banthony <banthony@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/06 13:17:44 by banthony          #+#    #+#              #
-#    Updated: 2019/11/28 16:18:53 by banthony         ###   ########.fr        #
+#    Updated: 2019/12/04 15:48:56 by banthony         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -68,6 +68,8 @@ all: $(NAME)
 	@echo $(INCLUDE)
 
 $(NAME): $(SRC) $(INCLUDE)
+	git submodule init
+	git submodule update
 	make -C $(LIBFT) sanit
 	gcc $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) $(DEBUG) -D $(DEFINE)
 	mkdir -p $(OBJ_PATH)
@@ -75,6 +77,8 @@ $(NAME): $(SRC) $(INCLUDE)
 	gcc $(FLAGS) -o $(NAME) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME_SANIT) $(OTHER_LIB) $(DEBUG) -D $(DEFINE)
 
 normal: $(SRC) $(INCLUDE)
+	git submodule init
+	git submodule update
 	make -C $(LIBFT)
 	gcc -g $(FLAGS) $(HEAD_DIR) $(OTHER_LIB) -c $(SRC) -D $(DEFINE)
 	mkdir -p $(OBJ_PATH)
@@ -82,13 +86,16 @@ normal: $(SRC) $(INCLUDE)
 	gcc -g $(FLAGS) $(OBJ2) $(HEAD_DIR) $(LIBFT_NAME) -o $(NAME) $(OTHER_LIB) -D $(DEFINE)
 	@echo "\033[32m•\033[0m $(NAME) ready"
 
+.SILENT: clean fclean
+
 clean:
-	make clean -C $(LIBFT)
-	rm -rf $(OBJ_PATH) $(TRASH)
+	-@make clean -C $(LIBFT)
+	-@rm -rf $(OBJ_PATH) $(TRASH)
+	@echo "\033[34m•\033[0m Clean."
 
 fclean: clean
-	make fclean -C $(LIBFT)
-	rm -f $(NAME)
-	-rm $(OBJ)
+	-@make fclean -C $(LIBFT)
+	-@rm -rf $(NAME)
+	@echo "\033[34m•\033[0m Full clean."
 
 re: fclean all
