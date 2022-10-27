@@ -42,7 +42,7 @@
 /*
 **	Maximum a.f.k. time for clients. (seconds)
 */
-# define CLIENT_TIMEOUT 60
+# define CLIENT_TIMEOUT 60 * 5
 
 # define TIMEOUT_MSG " Timeout - afk more than " NAMEOF_CONTENT(CLIENT_TIMEOUT) " seconds."
 /*
