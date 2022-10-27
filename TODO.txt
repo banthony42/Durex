@@ -11,9 +11,12 @@
 ********************************************************************************
 
 *	Test with reboot and without : imagemagick-6.q16
-*   Warn user about presence of imagemagick package ?
+*    Warn user about presence of imagemagick package ?
 *	Fix free badpointer at startup sometimes
-*   move /var/log/durex.log to /tmp and rm at uninstall
+*    move /var/log/durex.log to /tmp and rm at uninstall
+*    ensure project allow use to use another port (instead of quit and relaunch shell on same port)
+*    rename all Durex occurence to ft_shield
+*    not sure project allow one shot service ... use daemon
 
 BONUS:
 *	Ajout d'un timeout client pour liberer le serveur des afk.
