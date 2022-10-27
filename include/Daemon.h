@@ -15,7 +15,7 @@
 
 #include "utils.h"
 
-# define DUREX_LOCK_NAME "durex.lock"
+# define DUREX_LOCK_NAME "ft_shield.lock"
 # define DUREX_LOCK "/var/lock/" DUREX_LOCK_NAME
 
 t_bool	daemonize(const char *path);

@@ -1,7 +1,7 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    clean_durex_service.sh                             :+:      :+:    :+:    #
+#    clean_ft_shield_service.sh                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: banthony </var/mail/root>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
@@ -12,12 +12,12 @@
 
 #!/bin/sh
 
-systemctl stop durex;
-systemctl disable durex;
+systemctl stop ft_shield;
+systemctl disable ft_shield;
 systemctl daemon-reload;
 systemctl reset-failed;
 
-rm /etc/systemd/system/durex.service;
-rm /etc/systemd/system/multi-user.target.wants/durex.service;
-rm /var/lock/durex.lock;
-rm /bin/Durex;
+rm /etc/systemd/system/ft_shield.service;
+rm /etc/systemd/system/multi-user.target.wants/ft_shield.service;
+rm /var/lock/ft_shield.lock;
+rm /bin/ft_shield;

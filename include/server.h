@@ -30,7 +30,7 @@
 # define CLIENT_LOG "connected and log."
 # define CONNEXION_REFUSED "Connexion refused."
 
-# define SERVER_PROMPT "Durex>"
+# define SERVER_PROMPT "ft_shield>"
 # define PASS_REQUEST "\xe2\x98\x82  - Enter password:"
 # define PASSWORD "d7767b86426ebd60a7e8c142160dad6d"
 

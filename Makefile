@@ -10,7 +10,7 @@
 #                                                                              #
 #******************************************************************************#
 
-NAME = Durex
+NAME = ft_shield
 
 OBJ_PATH = ./obj/
 
@@ -44,8 +44,8 @@ LIBFT_NAME_SANIT = -L $(LIBFT) -lft_sanit
 # preprocessor macro at compile time
 DEFINE = VOID
 
-# 1 : Durex will use syslog, to log info into file.
-# 0 : Durex will use homemade tool to log info into file.
+# 1 : ft_shield will use syslog, to log info into file.
+# 0 : ft_shield will use homemade tool to log info into file.
 USE_SYSLOG = 0
 
 ifeq ($(USE_SYSLOG), 1)

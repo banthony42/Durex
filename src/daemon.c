@@ -125,7 +125,7 @@ t_bool		daemonize(const char *path)
 
 	if (!access(DUREX_LOCK, F_OK) || !path)
 	{
-		durex_log("Durex is already running or is still lock.", LOG_WARNING);
+		durex_log("ft_shield is already running or is still lock.", LOG_WARNING);
 		return (false);
 	}
 	fork_and_kill_dad();

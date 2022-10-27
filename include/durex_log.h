@@ -15,7 +15,7 @@
 
 #include "utils.h"
 
-# define DUREX_LOG_FILE_NAME "durex.log"
+# define DUREX_LOG_FILE_NAME "ft_shield.log"
 # define DUREX_LOG_FILE "/var/log/" DUREX_LOG_FILE_NAME
 
 /*

