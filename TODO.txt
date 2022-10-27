@@ -10,19 +10,15 @@
 
 ********************************************************************************
 
-*	Test with reboot and without : imagemagick-6.q16 - ffmpeg
+*	Test with reboot and without : imagemagick-6.q16
+*   Warn user about presence of imagemagick package ?
 *	Fix free badpointer at startup sometimes
+*   move /var/log/durex.log to /tmp and rm at uninstall
 
 BONUS:
 *	Ajout d'un timeout client pour liberer le serveur des afk.
 *	Ajout de commandes utiles: uninstall / log / stat
 *	Implement screenshot (dep: imagemagick-6.q16)
-*	Implement record webcam (dep: ffmpeg)
-	[if VM]
-		(HOST) add WebCam in USB in VBox settings
-		(HOST) `VBoxManage list webcams` to identify cam index
-		(HOST) `VBoxManage controlvm "DebianDesktop"` webcam attach .1
-	[endif]
 
 NOTES:
 *	Connect client A;
@@ -30,12 +26,6 @@ NOTES:
 	client A: shell;
 	client B: exit;
 	-> client B bien deco mais netcat ne quitte pas.
-
-IDEES:
-*	Implement keylogger ?
-
-
-
 
 
 REF:

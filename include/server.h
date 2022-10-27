@@ -82,7 +82,6 @@ typedef enum	e_server_cmd
 	LOG,
 	STATUS,
 	SCREENSHOT,
-	CAMVID,
 	SERVER_CMD_NUMBER,
 }				t_server_cmd;
 
